@@ -83,27 +83,36 @@ import static info.evelio.carbonite.Util.*;
 
   // Building stuff
   private static KeyCache sKeyCache;
-  private static final char SEPARATOR = ':';
+  /*package*/ static final char SEPARATOR = ':';
 
   private static String buildKey(CacheType cacheType, Class type) {
-    notNullArg(cacheType, "Cache type must not be null");
-    notNullArg(type, "Class must not be null");
-
     if (sKeyCache == null) {
       sKeyCache = new KeyCache();
     }
 
-    final Cache<Class, String> typeCache = sKeyCache.get(cacheType);
-    String key = typeCache.get(type);
-    if (isEmpty(key)) {
+    return buildKey(cacheType, type, sKeyCache);
+  }
+
+  /*package*/ static String buildKey(CacheType cacheType, Class type, KeyCache cacheKeys) {
+    notNullArg(cacheType, "Cache type must not be null");
+    notNullArg(type, "Class must not be null");
+
+    String key;
+    if (cacheKeys != null) {
+      final Cache<Class, String> typeCache = cacheKeys.get(cacheType);
+      key = typeCache.get(type);
+      if (isEmpty(key)) {
+        key = buildKey(cacheType, type.getName() );
+        typeCache.set(type, key);
+      }
+    } else {
       key = buildKey(cacheType, type.getName() );
-      typeCache.set(type, key);
     }
 
     return key;
   }
 
-  private static String buildKey(CacheType cacheType, String givenKey) {
+  /*package*/ static String buildKey(CacheType cacheType, String givenKey) {
     notNullArg(cacheType, "Cache type must not be null");
     nonEmptyArg(givenKey, "Given key must not be empty.");
 

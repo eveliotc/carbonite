@@ -26,12 +26,12 @@ public abstract class Carbonite {
   }
 
   public enum CacheType {
-    MEMORY('m'),
-    STORAGE('s');
+    MEMORY("m"),
+    STORAGE("s");
 
-    /*package*/ final char mPrefix;
+    /*package*/ final String mPrefix;
 
-    CacheType(char prefix) {
+    CacheType(String prefix) {
       nonEmptyArg(prefix, "Prefix must not be empty.");
 
       mPrefix = prefix;
