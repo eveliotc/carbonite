@@ -10,16 +10,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
 
+import static info.evelio.carbonite.Carbonite.CacheType.MEMORY;
 import static info.evelio.carbonite.Carbonite.Defaults.LOAD_FACTOR;
 import static info.evelio.carbonite.CarboniteBuilder.Options;
 import static info.evelio.carbonite.Util.*;
 
 /*package*/ class CarboniteImp extends Carbonite {
 
-  private final Cache<Class, Cache> mCaches;
+  private final Cache<String, Cache> mCaches;
 
-  public CarboniteImp(Cache<Class, Cache> caches) {
-    mCaches = new UnmodifiableCache<Class, Cache>(caches);
+  public CarboniteImp(Cache<String, Cache> caches) {
+    mCaches = new UnmodifiableCache<String, Cache>(caches);
   }
 
   @Override
@@ -56,7 +57,7 @@ import static info.evelio.carbonite.Util.*;
 
     notNull(value, "Unable to determinate type of null value.");
 
-    final Cache<String, T> cache = (Cache<String, T>) cacheFor( value.getClass() );
+    final Cache<String, T> cache = (Cache<String, T>) cacheFor(MEMORY, value.getClass() );
     cache.set(key, value);
 
     return this;
@@ -66,19 +67,46 @@ import static info.evelio.carbonite.Util.*;
   public <T> T memory(String key, Class<T> type) {
     validateKey(key);
 
-    return cacheFor(type).get(key);
+    return cacheFor(MEMORY, type).get(key);
   }
 
-  private <T> Cache<String, T> cacheFor(Class<T> type) {
-    notNullArg(type, "Type must not be null");
-
-    final Cache<String, T> cache = mCaches.get(type);
+  private <T> Cache<String, T> cacheFor(CacheType cacheType, Class<T> type) {
+    final Cache<String, T> cache = mCaches.get( buildKey(cacheType, type) );
     notNull(cache, "Cache for given type is null, did you include it when retaining(Class)?.");
 
     return cache;
   }
 
   // Building stuff
+  private static KeyCache sKeyCache;
+  private static final char SEPARATOR = ':';
+
+  private static String buildKey(CacheType cacheType, Class type) {
+    notNullArg(cacheType, "Cache type must not be null");
+    notNullArg(type, "Class must not be null");
+
+    if (sKeyCache == null) {
+      sKeyCache = new KeyCache();
+    }
+
+    final Cache<Class, String> typeCache = sKeyCache.get(cacheType);
+    String key = typeCache.get(type);
+    if (isEmpty(key)) {
+      key = buildKey(cacheType, type.getName() );
+      typeCache.set(type, key);
+    }
+
+    return key;
+  }
+
+  private static String buildKey(CacheType cacheType, String givenKey) {
+    notNullArg(cacheType, "Cache type must not be null");
+    nonEmptyArg(givenKey, "Given key must not be empty.");
+
+    return new StringBuilder(cacheType.mPrefix)
+        .append(SEPARATOR)
+        .append(givenKey).toString();
+  }
 
   /*package*/ static class DefaultCacheFactory {
     public static <T> Cache buildFor(Options options, CacheType type) {
@@ -91,38 +119,7 @@ import static info.evelio.carbonite.Util.*;
           return null;
       }
     }
-
-    private static KeyCache sKeyCache;
-    private static final char SEPARATOR = ':';
-
-    public static String buildKey(CacheType cacheType, Class type) {
-      notNullArg(cacheType, "Cache type must not be null");
-      notNullArg(type, "Class must not be null");
-
-      if (sKeyCache == null) {
-        sKeyCache = new KeyCache();
-      }
-
-      final Cache<Class, String> typeCache = sKeyCache.get(cacheType);
-      String key = typeCache.get(type);
-      if (isEmpty(key)) {
-        key = buildKey(cacheType, type.getName() );
-        typeCache.set(type, key);
-      }
-
-      return key;
-    }
-
-    public static String buildKey(CacheType cacheType, String givenKey) {
-      notNullArg(cacheType, "Cache type must not be null");
-      nonEmptyArg(givenKey, "Given key must not be empty.");
-
-      return new StringBuilder(cacheType.mPrefix)
-          .append(SEPARATOR)
-          .append(givenKey).toString();
-    }
   }
-
 
   /*package*/ static class Builder implements CarboniteBuilder {
     private final Context mContext;
@@ -160,7 +157,7 @@ import static info.evelio.carbonite.Util.*;
       final Set<Map.Entry<Class,Options>> entries = mClasses.entrySet();
 
       // This is were we set all our caches
-      final Cache<Class, Cache> caches = new ReferenceCache<Class, Cache>(length, 1, false);
+      final Cache<String, Cache> caches = new ReferenceCache<String, Cache>(length, 1, false);
 
       // For every retained class
       for (Map.Entry<Class,Options> entry : entries) {
@@ -171,7 +168,7 @@ import static info.evelio.carbonite.Util.*;
           // try to built with given options
           final Cache built = DefaultCacheFactory.buildFor( options, cacheType );
           if (built != null) { // success?
-            caches.set( key, built ); // alrite let's cache it!
+            caches.set( buildKey(cacheType, key), built ); // alrite let's cache it!
           }
         }
       }
