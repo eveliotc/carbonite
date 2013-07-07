@@ -19,18 +19,18 @@ Carbonite keeps your POJOs in memory while transparently persisting them in back
 
 ### Usage
 1. Include it in your project. 
+`TODO info regarding jar, maven, gradle, etc.`
 
-`TODO info regarding jar, maven, gradle, etc.`.
 
 2. Build your carbonite instance:
 ```java
-  Carbonite.using(context) /* `getApplicationContext()` is used and not retained */
+  Carbonite.using(context) /* getApplicationContext() is used and not retained */
         .retaining(YourPojo.class)
         .in(MEMORY) /* optional */
         .and(STORAGE) /* optional */
-        /* This can be replaced by just `build()` */
+        /* This can be replaced by just build() */
         .iLoveYou() /* Does nothing */
-        .iKnow(); // calls `build()`
+        .iKnow(); // calls build()
 ```
 
 3. Use it:
@@ -62,6 +62,7 @@ From memory or storage:
 - Zero boilerplate code
 - Fast
 - Reliable
+- Dependencies free
 - Optimized for Android
 - Easy and fun to use
 
@@ -84,7 +85,7 @@ This is a raw short term roadmap of features that I'd like to see in Carbonite:
 
 
 ### About
-Brought to you by the Carbonite contributors and [this guy](http://gplus.to/eveliotc).
+Brought to you by the Carbonite contributors specially [this guy](http://gplus.to/eveliotc).
 
 Carbonite relies (yet totally optional) on the following awesome open source software:
 
