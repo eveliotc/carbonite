@@ -10,10 +10,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
 
-import static info.evelio.carbonite.Carbonite.Defaults.*;
+import static info.evelio.carbonite.Carbonite.Defaults.LOAD_FACTOR;
 import static info.evelio.carbonite.CarboniteBuilder.Options;
 import static info.evelio.carbonite.Util.*;
-import static info.evelio.carbonite.Util.nonEmptyArg;
 
 /*package*/ class CarboniteImp extends Carbonite {
 
@@ -81,48 +80,6 @@ import static info.evelio.carbonite.Util.nonEmptyArg;
 
   // Building stuff
 
-  private static KeyCache sKeyCache;
-
-  /*package static*/ enum CacheType {
-    MEMORY('m'),
-    STORAGE('s');
-    private static final char SEPARATOR = ':';
-
-    private final char mKeyName;
-
-    CacheType(char keyName) {
-      nonEmptyArg(keyName, "Key name must not be empty.");
-
-      mKeyName = keyName;
-    }
-
-    public String buildKey(Class type) {
-      notNullArg(type, "Class must not be null");
-
-      if (sKeyCache == null) {
-        sKeyCache = new KeyCache();
-      }
-
-      final Cache<Class, String> typeCache = sKeyCache.get(this);
-      String key = typeCache.get(type);
-      if (isEmpty(key)) {
-        key = buildKey( type.getName() );
-        typeCache.set(type, key);
-      }
-
-      return key;
-    }
-
-    public String buildKey(String givenKey) {
-      nonEmptyArg(givenKey, "Given key must not be empty.");
-
-      return new StringBuilder(mKeyName)
-          .append(SEPARATOR)
-          .append(givenKey).toString();
-    }
-
-  };
-
   /*package*/ static class DefaultCacheFactory {
     public static <T> Cache buildFor(Options options, CacheType type) {
       switch (type) {
@@ -133,6 +90,36 @@ import static info.evelio.carbonite.Util.nonEmptyArg;
           Util.illegalState(true, "Not yet implemented cache type " + type);
           return null;
       }
+    }
+
+    private static KeyCache sKeyCache;
+    private static final char SEPARATOR = ':';
+
+    public static String buildKey(CacheType cacheType, Class type) {
+      notNullArg(cacheType, "Cache type must not be null");
+      notNullArg(type, "Class must not be null");
+
+      if (sKeyCache == null) {
+        sKeyCache = new KeyCache();
+      }
+
+      final Cache<Class, String> typeCache = sKeyCache.get(cacheType);
+      String key = typeCache.get(type);
+      if (isEmpty(key)) {
+        key = buildKey(cacheType, type.getName() );
+        typeCache.set(type, key);
+      }
+
+      return key;
+    }
+
+    public static String buildKey(CacheType cacheType, String givenKey) {
+      notNullArg(cacheType, "Cache type must not be null");
+      nonEmptyArg(givenKey, "Given key must not be empty.");
+
+      return new StringBuilder(cacheType.mPrefix)
+          .append(SEPARATOR)
+          .append(givenKey).toString();
     }
   }
 

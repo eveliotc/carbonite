@@ -4,6 +4,8 @@ import android.content.Context;
 
 import java.util.concurrent.Future;
 
+import static info.evelio.carbonite.Util.nonEmptyArg;
+
 public abstract class Carbonite {
 
   public abstract <T> Carbonite set(String key, T value);
@@ -20,6 +22,19 @@ public abstract class Carbonite {
     public static final int STORAGE_VALUE = 0;
     public static final boolean NULL_VALUES = false;
     public static final float LOAD_FACTOR = 0.75f;
+  }
+
+  public enum CacheType {
+    MEMORY('m'),
+    STORAGE('s');
+
+    /*package*/ final char mPrefix;
+
+    CacheType(char prefix) {
+      nonEmptyArg(prefix, "Prefix must not be empty.");
+
+      mPrefix = prefix;
+    }
   }
 
   public static CarboniteBuilder using(Context context) {
