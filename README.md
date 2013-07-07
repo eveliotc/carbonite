@@ -7,11 +7,11 @@ A simple in memory and persistent `Object` cache for Android.
 
 <hr/>
 
-Carbonite aims to deal with your data POJOs (JavaBeans folks anyone?) without boilerplate code, so you can forguet about ORMs, SQLite, `Cursor`s, `ContentProvider`s, etc. for data that you arleady hold in `Object`s anyways.
+Carbonite aims to deal with your data POJOs (JavaBeans folks anyone?) without boilerplate code, so you can forgforgetuet about ORMs, SQLite, `Cursor`s, `ContentProvider`s, etc. for data that you already hold in `Object`s anyways.
 
-Although it can be used as the only persistence solution on Android, is not one of carbonite goals to do so, you should evaluate when traditional persistence solutions make more sense based in your problem.
+Although it can be used as the only persistence solution on Android, *it is not* one of carbonite goals to do so, you should evaluate when traditional persistence solutions make more sense based on your problem.
 
-**Note**: Carbonite is currently under heavy first version development so API and such might change among versions.
+**Note**: Carbonite is currently under heavy first version development so API and stuff might change among versions, please bear with us.
 
 ### How does it work?
 
@@ -19,16 +19,18 @@ Carbonite keeps your POJOs in memory while transparently persisting them in back
 
 ### Usage
 1. Include it in your project. 
+
 `TODO info regarding jar, maven, gradle, etc.`.
 
 2. Build your carbonite instance:
 ```java
-  Carbonite.using(context)
-    .retaining(YourPojo.class)
-    .in(MEMORY)
-    .and(STORAGE)
-    .iLoveYou()
-    .iKnow();
+  Carbonite.using(context) /* `getApplicationContext()` is used and not retained */
+        .retaining(YourPojo.class)
+        .in(MEMORY) /* optional */
+        .and(STORAGE) /* optional */
+        /* This can be replaced by just `build()` */
+        .iLoveYou() /* Does nothing */
+        .iKnow(); // calls `build()`
 ```
 
 3. Use it:
@@ -38,23 +40,26 @@ Carbonite keeps your POJOs in memory while transparently persisting them in back
   ...
   carbonite.set("data", data); // will keep it in memory and storage
 ```
+You can also use `memory` and `storage`.
 ##### get
 From memory:
 ```java
-  YourPojo stored = carbonite.memory("data");
+  YourPojo stored = carbonite.memory("data", YourPojo.class);
+```
+From storage:
+```java
+  YourPojo stored = carbonite.storage("data", YourPojo.class);
 ```
 From memory or storage:
 ```java
-  Future<YourPojo> future = carbonite.get("data");
+  Future<YourPojo> future = carbonite.get("data", YourPojo.class);
   …
   YourPojo stored = future.get();
 ```
 
 ### Goals
-Carbonite aims to be/have:
-
-- Simple
-- Zero boilerplate on your end
+- Simplicity (DRY, YAGNI, etc.)
+- Zero boilerplate code
 - Fast
 - Reliable
 - Optimized for Android
@@ -65,23 +70,23 @@ Carbonite aims to be/have:
 This is a raw short term roadmap of features that I'd like to see in Carbonite:
 
 - A sample app (in progress)
+- Optional unsafe `get`, `retaining`, etc. methods without `Class` param.
 - Future listeners
-- Auto keys (in POJO -interface, annotations, code generation, hashcode maybe baby- or using a third object to provide it)
+- Auto keys (in POJO -interface, annotations, code generation, `hashCode()` maybe baby- or using a third object to provide it)
 - Bulk operations
-- Eviction (allow using weighters, etc. for auto eviction)
+- Eviction (allow using weigher, etc. for auto eviction)
 - CRUD notifications (e.g. using listeners or events)
 - Auto update references
 - Object pooling
 - Stats
-- Help with Lifecyle instances (fragments, activities, etc.) to evict no longer needed objects.
-- Allow more cache (TTL, references, etc.) and serialization (JSON, Java Serialization, etc.) implementations
-
+- Help with Carbonite instances hold by life cycle objects (`Fragment`, `Activity`, etc.).
+- Allow more cache (in memory/storage TTL, references, etc.) and serialization (JSON, Java Serialization, etc.) implementations.
 
 
 ### About
-Brought to you by [this guy](http://gplus.to/eveliotc) and the Carbonite contributors.
+Brought to you by the Carbonite contributors and [this guy](http://gplus.to/eveliotc).
 
-Carbonite relies (yet totally optional) in the following awesome open source software:
+Carbonite relies (yet totally optional) on the following awesome open source software:
 
 - [kryo](https://code.google.com/p/kryo)
 - [DiskLruCache](https://github.com/JakeWharton/DiskLruCache)
