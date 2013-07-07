@@ -6,8 +6,11 @@ sourceSets {
 }
 
 dependencies {
+    unitTestCompile 'com.google.android:android:4.1.1.4'
     unitTestCompile 'junit:junit:4.11'
+    unitTestCompile 'org.mockito:mockito-core:1.9.5'
     unitTestCompile 'org.robolectric:robolectric:2.1.1'
+    unitTestCompile 'com.squareup:fest-android:1.0.5'
 }
 
 

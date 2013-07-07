@@ -28,6 +28,7 @@ local.properties
 # gradle
 .gradle
 build
+lib
 
 # logs
 *.log
