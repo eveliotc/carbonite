@@ -155,7 +155,7 @@ import static info.evelio.carbonite.Util.nonEmptyArg;
         mClasses = new LinkedHashMap<Class, Options>(1, LOAD_FACTOR);
       }
 
-      DefaultOptions options = new DefaultOptions(this);
+      BaseOptions options = new BaseOptions(this);
       mClasses.put(type, options);
       return options;
     }
@@ -192,64 +192,6 @@ import static info.evelio.carbonite.Util.nonEmptyArg;
       return new CarboniteImp( caches );
     }
 
-  }
-
-  /*package*/ static class DefaultOptions implements Options {
-    private final CarboniteBuilder mCarboniteBuilder;
-    /*package*/ int mMemory = MEMORY_VALUE;
-    /*package*/ int mStorage = STORAGE_VALUE;
-    /*package*/ boolean mNullValues = NULL_VALUES;
-
-    public DefaultOptions(CarboniteBuilder carboniteBuilder) {
-      notNullArg(carboniteBuilder, "Builder must not be null.");
-
-      mCarboniteBuilder = carboniteBuilder;
-    }
-
-    @Override
-    public Options inMemory(int capacity) {
-      illegalArg(capacity < 1, "If you don't want objects in memory, why are you even using this?");
-
-      mMemory = capacity;
-      return this;
-    }
-
-    @Override
-    public Options inStorage(int capacity) {
-      mStorage = capacity;
-      return this;
-    }
-
-    @Override
-    public Options nullValues(boolean allow) {
-      mNullValues = allow;
-      return this;
-    }
-
-    @Override
-    public CarboniteBuilder plus() {
-      return mCarboniteBuilder;
-    }
-
-    @Override
-    public CarboniteBuilder and() {
-      return mCarboniteBuilder;
-    }
-
-    @Override
-    public int inMemory() {
-      return mMemory;
-    }
-
-    @Override
-    public int inStorage() {
-      return mStorage;
-    }
-
-    @Override
-    public boolean nullValues() {
-      return mNullValues;
-    }
   }
 
   /*package*/ static class KeyCache implements Cache<CacheType, Cache<Class, String>> {
