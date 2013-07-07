@@ -12,7 +12,6 @@ import java.util.concurrent.Future;
 
 import static info.evelio.carbonite.Carbonite.CacheType.MEMORY;
 import static info.evelio.carbonite.Carbonite.Defaults.LOAD_FACTOR;
-import static info.evelio.carbonite.CarboniteBuilder.Options;
 import static info.evelio.carbonite.Util.*;
 
 /*package*/ class CarboniteImp extends Carbonite {
@@ -108,19 +107,6 @@ import static info.evelio.carbonite.Util.*;
         .append(givenKey).toString();
   }
 
-  /*package*/ static class DefaultCacheFactory {
-    public static <T> Cache buildFor(Options options, CacheType type) {
-      switch (type) {
-        case MEMORY:
-          return new ReferenceCache<String, T>(options.inMemory(), LOAD_FACTOR, options.nullValues());
-        case STORAGE:
-        default:
-          Util.illegalState(true, "Not yet implemented cache type " + type);
-          return null;
-      }
-    }
-  }
-
   /*package*/ static class Builder implements CarboniteBuilder {
     private final Context mContext;
     private Map<Class, Options> mClasses;
@@ -129,6 +115,11 @@ import static info.evelio.carbonite.Util.*;
       notNullArg(applicationContext, "Context must not be null.");
 
       mContext = applicationContext;
+    }
+
+    @Override
+    public Context context() {
+      return mContext;
     }
 
     @Override
@@ -156,21 +147,19 @@ import static info.evelio.carbonite.Util.*;
       final int length = len(mClasses);
       final Set<Map.Entry<Class,Options>> entries = mClasses.entrySet();
 
-      // This is were we set all our caches
+      // This is where we set all our caches
       final Cache<String, Cache> caches = new ReferenceCache<String, Cache>(length, 1, false);
 
       // For every retained class
       for (Map.Entry<Class,Options> entry : entries) {
         final Class key = entry.getKey();
         final Options options = entry.getValue();
-        // For every cache type
-        for (CacheType cacheType : CacheType.values()) {
-          // try to built with given options
-          final Cache built = DefaultCacheFactory.buildFor( options, cacheType );
-          if (built != null) { // success?
-            caches.set( buildKey(cacheType, key), built ); // alrite let's cache it!
-          }
-        }
+
+        // try to built with given options
+        final Cache built = options.factory().build(options);
+        notNull(built, "Failure building cache");
+
+        caches.set(buildKey(options.on(), key), built); // alrite let's cache it!
       }
 
       return new CarboniteImp( caches );

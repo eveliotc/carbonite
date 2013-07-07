@@ -17,11 +17,12 @@ public abstract class Carbonite {
   public abstract <T> T memory(String key, Class<T> type);
   public abstract <T> Future<T> storage(String key, Class<T> type);
 
-  public static final class Defaults {
-    public static final int MEMORY_VALUE = 100;
-    public static final int STORAGE_VALUE = 0;
+  /*package*/ static final class Defaults {
     public static final boolean NULL_VALUES = false;
     public static final float LOAD_FACTOR = 0.75f;
+    public static final int CAPACITY = 0;
+    public static final CacheType TYPE = CacheType.MEMORY;
+    public static final CacheFactory FACTORY = CacheFactoryImp.INSTANCE;
   }
 
   public enum CacheType {
