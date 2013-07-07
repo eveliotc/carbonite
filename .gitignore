@@ -9,8 +9,8 @@
 *.class
 
 # generated files
-bin/
-gen/
+bin
+gen
 
 # Local configuration file (sdk path, etc)
 local.properties
@@ -18,3 +18,23 @@ local.properties
 # Eclipse project files
 .classpath
 .project
+
+# IntelliJ IDEA/Android Studio files
+.idea
+*.iws
+*.iml
+*.ipr
+
+# gradle
+.gradle
+build
+
+# logs
+*.log
+
+# some other properties file
+local.properties
+default.properties
+
+# OS X files
+.DS_Store
