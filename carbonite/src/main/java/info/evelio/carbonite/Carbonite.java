@@ -2,20 +2,9 @@ package info.evelio.carbonite;
 
 import android.content.Context;
 
-import java.util.concurrent.Future;
-
 import static info.evelio.carbonite.Util.nonEmptyArg;
 
-public abstract class Carbonite {
-
-  public abstract <T> Carbonite set(String key, T value);
-  public abstract <T> Future<T> get(String key, Class<T> type);
-
-  public abstract <T> Carbonite memory(String key, T value);
-  public abstract <T> Carbonite storage(String key, T value);
-
-  public abstract <T> T memory(String key, Class<T> type);
-  public abstract <T> Future<T> storage(String key, Class<T> type);
+public abstract class Carbonite implements CarboniteApi {
 
   /*package*/ static final class Defaults {
     public static final boolean NULL_VALUES = false;

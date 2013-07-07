@@ -5,8 +5,7 @@ import info.evelio.carbonite.cache.ReferenceCache;
 import info.evelio.carbonite.cache.UnmodifiableCache;
 import info.evelio.carbonite.future.Present;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.Future;
 
@@ -48,7 +47,7 @@ import static info.evelio.carbonite.Util.*;
   }
 
   @Override
-  public <T> Future<T> storage(String key, Class<T> type) {
+  public <T> T storage(String key, Class<T> type) {
     illegalState(true, "Unimplemented");
     return null;
   }
@@ -123,7 +122,7 @@ import static info.evelio.carbonite.Util.*;
 
   /*package*/ static class Builder implements CarboniteBuilder {
     private final Context mContext;
-    private Map<Class, Options> mClasses;
+    private Set<Options> mOptions;
 
     public Builder(Context applicationContext) {
       notNullArg(applicationContext, "Context must not be null.");
@@ -140,12 +139,12 @@ import static info.evelio.carbonite.Util.*;
     public Options retaining(Class type) {
       notNullArg(type, "Class must not be null");
 
-      if (mClasses == null) {
-        mClasses = new LinkedHashMap<Class, Options>(1, LOAD_FACTOR);
+      if (mOptions == null) {
+        mOptions = new LinkedHashSet<Options>(1, LOAD_FACTOR);
       }
 
-      BaseOptions options = new BaseOptions(this);
-      mClasses.put(type, options);
+      BaseOptions options = new BaseOptions(this, type);
+      mOptions.add(options);
       return options;
     }
 
@@ -156,24 +155,28 @@ import static info.evelio.carbonite.Util.*;
 
     @Override
     public Carbonite iKnow() {
-      nonEmpty(mClasses, "You must specify types you will cache.");
+      return build();
+    }
 
-      final int length = len(mClasses);
-      final Set<Map.Entry<Class,Options>> entries = mClasses.entrySet();
+    @Override
+    public Carbonite build() {
+      nonEmpty(mOptions, "You must specify types you will cache.");
+
+      final int length = len(mOptions);
 
       // This is where we set all our caches
       final Cache<String, Cache> caches = new ReferenceCache<String, Cache>(length, 1, false);
 
       // For every retained class
-      for (Map.Entry<Class,Options> entry : entries) {
-        final Class key = entry.getKey();
-        final Options options = entry.getValue();
+      for (final Options options : mOptions) {
+        final Class type = options.retaining();
+        final CacheType cacheType = options.in();
 
         // try to built with given options
         final Cache built = options.factory().build(options);
         notNull(built, "Failure building cache");
 
-        caches.set(buildKey(options.on(), key), built); // alrite let's cache it!
+        caches.set(buildKey(cacheType, type), built); // alrite let's cache it!
       }
 
       return new CarboniteImp( caches );

@@ -17,7 +17,7 @@ import static info.evelio.carbonite.Util.notNullArg;
       illegalState(true, "Implementation instantiation not yet implemented.");
     }
 
-    final CacheType type = options.on();
+    final CacheType type = options.in();
 
     switch (type) {
       case MEMORY:

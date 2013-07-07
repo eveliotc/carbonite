@@ -20,18 +20,22 @@ public class BaseOptionsTest {
   private final Context mContext = Robolectric.application;
 
   @Test(expected = Exception.class) public void testNullBuilderThrows() {
-    new BaseOptions(null);
+    new BaseOptions(null, Object.class);
   }
 
-  @Test public void testNotNullBuilder() {
-    BaseOptions opts = new BaseOptions( mockBuilder() );
+  @Test(expected = Exception.class) public void testNullClassThrows() {
+    new BaseOptions(mockBuilder(), null);
+  }
+
+  @Test public void testNotNull() {
+    BaseOptions opts = new BaseOptions( mockBuilder(), Object.class );
   }
 
   @Test public void testDefaultValues() {
-    BaseOptions opts = new BaseOptions( mockBuilder() );
+    BaseOptions opts = new BaseOptions( mockBuilder(), Object.class );
 
     assertThat(opts.factory()).isNotNull();
-    assertThat(opts.on()).isInstanceOf(CacheType.class);
+    assertThat(opts.in()).isInstanceOf(CacheType.class);
     assertThat(opts.capacity()).isGreaterThanOrEqualTo(0);
     assertThat(opts.loadFactor()).isPositive();
     assertThat(opts.builder()).isNotNull();
@@ -43,8 +47,8 @@ public class BaseOptionsTest {
     final CacheFactory factory = mockFactory();
     final CarboniteBuilder builder = mockBuilder();
 
-    final CarboniteBuilder.Options opts = new BaseOptions(builder)
-        .on(STORAGE)
+    final CarboniteBuilder.Options opts = new BaseOptions(builder, Object.class)
+        .in(STORAGE)
         .nullValues(true)
         .capacity(12)
         .loadFactor(2.0f)
@@ -52,7 +56,7 @@ public class BaseOptionsTest {
         .factory(factory);
 
     assertThat(opts.builder()).isEqualTo(builder);
-    assertThat(opts.on()).isEqualTo(STORAGE);
+    assertThat(opts.in()).isEqualTo(STORAGE);
     assertThat(opts.nullValues()).isTrue();
     assertThat(opts.capacity()).isEqualTo(12);
     assertThat(opts.loadFactor()).isEqualTo(2.0f);
