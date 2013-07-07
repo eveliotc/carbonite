@@ -22,6 +22,7 @@ import static info.evelio.carbonite.Util.*;
     mCaches = new UnmodifiableCache<String, Cache>(caches);
   }
 
+  // both
   @Override
   public <T> Carbonite set(String key, T value) {
     illegalState(true, "Unimplemented");
@@ -38,17 +39,21 @@ import static info.evelio.carbonite.Util.*;
     return null;
   }
 
+  // storage
+
   @Override
   public <T> Carbonite storage(String key, T value) {
+    illegalState(true, "Unimplemented");
     return this;
   }
 
   @Override
   public <T> Future<T> storage(String key, Class<T> type) {
+    illegalState(true, "Unimplemented");
     return null;
   }
 
-  // Memory
+  // memory
 
   @Override
   public <T> Carbonite memory(String key, T value) {
