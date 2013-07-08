@@ -35,6 +35,7 @@ public interface CarboniteBuilder {
 
     /**
      * Note: Must spawn a new Options for current retained class instead of return this
+     * TODO: Should it use a clone approach?
      */
     public Options and(Carbonite.CacheType type);
   }

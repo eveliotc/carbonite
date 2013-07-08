@@ -120,6 +120,8 @@ public class BaseOptions implements CarboniteBuilder.Options {
     return retaining(mRetaining).in(type);
   }
 
+  // Wrapped methods for CarboniteBuilder
+
   @Override
   public Context context() {
     return mCarboniteBuilder.context();
@@ -144,5 +146,5 @@ public class BaseOptions implements CarboniteBuilder.Options {
   public Carbonite build() {
     return mCarboniteBuilder.build();
   }
-
+  //
 }

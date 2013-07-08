@@ -10,6 +10,7 @@ import org.robolectric.annotation.Config;
 
 import static info.evelio.carbonite.Carbonite.CacheType;
 import static info.evelio.carbonite.Carbonite.CacheType.STORAGE;
+import static info.evelio.carbonite.CarboniteBuilder.Options;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -17,10 +18,11 @@ import static org.mockito.Mockito.when;
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE)
 public class BaseOptionsTest {
+  private final Class<? extends Object> CLASS_TO_RETAIN = Object.class;
   private final Context mContext = Robolectric.application;
 
   @Test(expected = Exception.class) public void testNullBuilderThrows() {
-    new BaseOptions(null, Object.class);
+    new BaseOptions(null, CLASS_TO_RETAIN);
   }
 
   @Test(expected = Exception.class) public void testNullClassThrows() {
@@ -28,11 +30,11 @@ public class BaseOptionsTest {
   }
 
   @Test public void testNotNull() {
-    BaseOptions opts = new BaseOptions( mockBuilder(), Object.class );
+    BaseOptions opts = new BaseOptions( mockBuilder(), CLASS_TO_RETAIN );
   }
 
   @Test public void testDefaultValues() {
-    BaseOptions opts = new BaseOptions( mockBuilder(), Object.class );
+    BaseOptions opts = new BaseOptions( mockBuilder(), CLASS_TO_RETAIN );
 
     assertThat(opts.factory()).isNotNull();
     assertThat(opts.in()).isInstanceOf(CacheType.class);
@@ -43,11 +45,11 @@ public class BaseOptionsTest {
     assertThat(opts.imp()).isNull();
   }
 
-  @Test public void testChaining() {
+  @Test public void testBaseChaining() {
     final CacheFactory factory = mockFactory();
     final CarboniteBuilder builder = mockBuilder();
 
-    final CarboniteBuilder.Options opts = new BaseOptions(builder, Object.class)
+    final Options opts = new BaseOptions(builder, CLASS_TO_RETAIN)
         .in(STORAGE)
         .nullValues(true)
         .capacity(12)
@@ -65,6 +67,42 @@ public class BaseOptionsTest {
     assertThat(opts.factory()).isEqualTo(factory);
   }
 
+  @Test public void andSpawnsNewOptionsAndSameRetaining() {
+    final Options opts = new BaseOptions( mockBuilder(), CLASS_TO_RETAIN );
+    for (CacheType type : CacheType.values()) {
+      final Options anotherOptions = opts.and(type);
+      assertThat(opts).isNotEqualTo( anotherOptions );
+      assertThat(opts.retaining() == anotherOptions.retaining()).isTrue();
+    }
+  }
+
+  @Test public void wrapingMethodsWillWrap() {
+    final ConfirmCallCarboniteBuilder builder = new ConfirmCallCarboniteBuilder();
+    final Options opts = new BaseOptions( builder, CLASS_TO_RETAIN );
+
+    assertThat(opts.builder()).isEqualTo(builder);
+
+    builder.reset();
+    opts.context();
+    builder.assertItWasCalled();
+
+    builder.reset();
+    opts.retaining(CLASS_TO_RETAIN);
+    builder.assertItWasCalled();
+
+    builder.reset();
+    opts.iLoveYou();
+    builder.assertItWasCalled();
+
+    builder.reset();
+    opts.iKnow();
+    builder.assertItWasCalled();
+
+    builder.reset();
+    opts.build();
+    builder.assertItWasCalled();
+  }
+
   private CacheFactory mockFactory() {
     return mock(CacheFactory.class);
   }
@@ -72,6 +110,7 @@ public class BaseOptionsTest {
   private CarboniteBuilder mockBuilder() {
     CarboniteBuilder mock = mock(CarboniteBuilder.class);
     when(mock.context()).thenReturn(mContext);
+    when(mock.retaining(CLASS_TO_RETAIN)).thenReturn(new BaseOptions(mock, CLASS_TO_RETAIN));
     return mock;
   }
 
