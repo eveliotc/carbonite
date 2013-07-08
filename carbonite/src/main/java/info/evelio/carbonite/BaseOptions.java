@@ -1,6 +1,8 @@
 package info.evelio.carbonite;
 
 import android.content.Context;
+import info.evelio.carbonite.cache.Cache;
+import info.evelio.carbonite.cache.CacheFactory;
 
 import static info.evelio.carbonite.Carbonite.CacheType;
 import static info.evelio.carbonite.Carbonite.Defaults.*;
@@ -13,7 +15,6 @@ public class BaseOptions implements CarboniteBuilder.Options {
 
   private int mCapacity = CAPACITY;
   private float mLoadFactor = LOAD_FACTOR;
-  private boolean mNullValues = NULL_VALUES;
   private CacheType mIn = TYPE;
   private CacheFactory mFactory = FACTORY;
 
@@ -55,12 +56,6 @@ public class BaseOptions implements CarboniteBuilder.Options {
   }
 
   @Override
-  public CarboniteBuilder.Options nullValues(boolean allow) {
-    mNullValues = allow;
-    return this;
-  }
-
-  @Override
   public CarboniteBuilder.Options imp(Class<? extends Cache> imp) {
     mImp = imp;
     return this;
@@ -88,11 +83,6 @@ public class BaseOptions implements CarboniteBuilder.Options {
   @Override
   public float loadFactor() {
     return mLoadFactor;
-  }
-
-  @Override
-  public boolean nullValues() {
-    return mNullValues;
   }
 
   @Override

@@ -2,12 +2,43 @@ package info.evelio.carbonite;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static info.evelio.carbonite.Util.obtainValidKey;
+import static info.evelio.carbonite.Util.validateKey;
+import static org.junit.Assert.*;
 
 public class UtilTest {
   // TODO Boilerplate tests here
+
+  private static final Class<? extends Object> TARGET_CLASS = Object.class;
+  private static final String GIVEN_KEY = obtainValidKey(TARGET_CLASS);
+
+  @Test public void testInvalidStringKeys() {
+    assertInvalidKey(null);
+    assertInvalidKey("");
+    assertInvalidKey(" ");
+    assertInvalidKey("$");
+    assertInvalidKey("á");
+    assertInvalidKey("adot.");
+  }
+
+  @Test public void testValidStringKeys() {
+    validateKey(GIVEN_KEY);
+    validateKey("m_" + GIVEN_KEY);
+    validateKey("yup");
+    validateKey("this_is-valid");
+    validateKey("n4mb3rs");
+    validateKey("1234567890");
+    validateKey("-____-");
+  }
+
+
+  private static void assertInvalidKey(String key) {
+    try {
+      validateKey(key);
+      fail("Key " + key + " seems valid");
+    } catch (Exception e) {}
+    // pass
+  }
 
   @Test public void testLenArray() {
     assertEquals(0, Util.len((Object[]) null));
@@ -17,17 +48,17 @@ public class UtilTest {
   }
 
   @Test public void testEmptyStr() {
-    assertTrue(Util.isEmpty((String) null));
-    assertTrue(Util.isEmpty(""));
+    assertTrue(Util.empty((String) null));
+    assertTrue(Util.empty(""));
 
-    assertFalse(Util.isEmpty("something"));
-    assertFalse(Util.isEmpty(" "));
+    assertFalse(Util.empty("something"));
+    assertFalse(Util.empty(" "));
   }
 
   @Test public void testEmptyChar() {
     final char empty = ' ';
-    assertTrue(Util.isEmpty(empty));
+    assertTrue(Util.empty(empty));
 
-    assertFalse(Util.isEmpty('e'));
+    assertFalse(Util.empty('e'));
   }
 }

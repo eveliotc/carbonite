@@ -1,6 +1,7 @@
 package info.evelio.carbonite;
 
 import android.content.Context;
+import info.evelio.carbonite.cache.CacheFactory;
 import info.evelio.carbonite.cache.ReferenceCache;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +42,6 @@ public class BaseOptionsTest {
     assertThat(opts.capacity()).isGreaterThanOrEqualTo(0);
     assertThat(opts.loadFactor()).isPositive();
     assertThat(opts.builder()).isNotNull();
-    assertThat(opts.nullValues()).isNotNull();
     assertThat(opts.imp()).isNull();
   }
 
@@ -51,7 +51,6 @@ public class BaseOptionsTest {
 
     final Options opts = new BaseOptions(builder, CLASS_TO_RETAIN)
         .in(STORAGE)
-        .nullValues(true)
         .capacity(12)
         .loadFactor(2.0f)
         .imp(ReferenceCache.class)
@@ -59,7 +58,6 @@ public class BaseOptionsTest {
 
     assertThat(opts.builder()).isEqualTo(builder);
     assertThat(opts.in()).isEqualTo(STORAGE);
-    assertThat(opts.nullValues()).isTrue();
     assertThat(opts.capacity()).isEqualTo(12);
     assertThat(opts.loadFactor()).isEqualTo(2.0f);
     // Couldn't find something to compare as most of classes will fail to compile

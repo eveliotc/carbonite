@@ -2,9 +2,14 @@ package info.evelio.carbonite;
 
 import info.evelio.carbonite.future.UncheckedFuture;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Future;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A bunch of boilerplate
@@ -15,52 +20,72 @@ public class Util {
 
 
   public static int len(Object[] arr) {
-    return isEmpty(arr) ? 0 : arr.length;
+    return empty(arr) ? 0 : arr.length;
   }
 
   public static int len(Collection collection) {
-    return isEmpty(collection) ? 0 : collection.size();
+    return empty(collection) ? 0 : collection.size();
   }
 
 
   public static int len(Map map) {
-    return isEmpty(map) ? 0 : map.size();
+    return empty(map) ? 0 : map.size();
   }
 
 
   public static int len(String str) {
-    return isEmpty(str) ? 0 : str.length();
+    return empty(str) ? 0 : str.length();
   }
 
   // Validation
 
-  public static boolean isEmpty(String str) {
+  public static boolean empty(String str) {
     return str == null || str.equals(""); // We could trim it but don't want to generate garbage
   }
 
-  public static boolean isEmpty(Object[] arr) {
+  public static boolean empty(Object[] arr) {
     return arr == null || arr.length < 1;
   }
 
-  public static boolean isEmpty(Collection collection) {
+  public static boolean empty(Collection collection) {
     return collection == null || collection.isEmpty();
   }
 
-  public static boolean isEmpty(Map map) {
+  public static boolean empty(Map map) {
     return map == null || map.isEmpty();
   }
 
-  public static boolean isEmpty(char ch) {
+  public static boolean empty(char ch) {
     return Character.isWhitespace(ch);
   }
 
-
+  /**
+   * Regex stolen from DiskLruCache
+   */
+  /*package*/ static final Matcher LEGAL_KEY_PATTERN = Pattern.compile("[a-z0-9_-]{1,64}").matcher("");
   public static void validateKey(Object key) {
     notNullArg(key, "Key must not be null.");
   }
 
   public static void validateKey(String key) {
-    illegalArg(isEmpty(key), "Key must not be empty.");
+    nonEmptyArg(key, "Key must not be empty.");
+    if (!LEGAL_KEY_PATTERN.reset(key).matches()) {
+      // not using boolean expression above in illegalArg as we don't want to generate an String every time
+      illegalArg(true, "Key must match the regex [a-z0-9_-]{1,64}. Given key " + key);
+    }
+  }
+
+  public static String obtainValidKey(Class type) {
+    notNullArg(type, "Type must not be null.");
+
+    /*
+    Using Locale.US as docs (https://developer.android.com/reference/java/util/Locale.html) say:
+
+    > The best choice there is usually Locale.US – this locale is guaranteed to be available on all devices,
+    > and the fact that it has no surprising special cases and is frequently used
+    > (especially for computer-computer communication) means that it tends to be the most efficient choice too.
+    */
+    return type.getName().replace('.', '_').replace('$', '-').toLowerCase(Locale.US);
   }
 
   public static <T> void validateValue(T value, boolean allowNullValues) {
@@ -85,6 +110,10 @@ public class Util {
     }
   }
 
+  public static void runtimeException(String msg, Throwable thr) {
+    throw new RuntimeException(msg, thr);
+  }
+
   public static void notNullArg(Object bob, String msg) {
     illegalArg(bob == null, msg);
   }
@@ -96,39 +125,39 @@ public class Util {
   }
 
   public static void nonEmptyArg(char ch, String msg) {
-    illegalArg(isEmpty(ch), msg);
+    illegalArg(empty(ch), msg);
   }
 
   public static void nonEmptyArg(String str, String msg) {
-    illegalArg(isEmpty(str), msg);
+    illegalArg(empty(str), msg);
   }
 
   public static void nonEmptyArg(Object[] arr, String msg) {
-    illegalArg(isEmpty(arr), msg);
+    illegalArg(empty(arr), msg);
   }
 
   public static void nonEmptyArg(Collection collection, String msg) {
-    illegalArg(isEmpty(collection), msg);
+    illegalArg(empty(collection), msg);
   }
 
   public static void nonEmpty(char ch, String msg) {
-    illegalState(isEmpty(ch), msg);
+    illegalState(empty(ch), msg);
   }
 
   public static void nonEmpty(String str, String msg) {
-    illegalState(isEmpty(str), msg);
+    illegalState(empty(str), msg);
   }
 
   public static void nonEmpty(Object[] arr, String msg) {
-    illegalState(isEmpty(arr), msg);
+    illegalState(empty(arr), msg);
   }
 
   public static void nonEmpty(Collection collection, String msg) {
-    illegalState(isEmpty(collection), msg);
+    illegalState(empty(collection), msg);
   }
 
   public static void nonEmpty(Map map, String msg) {
-    illegalState(isEmpty(map), msg);
+    illegalState(empty(map), msg);
   }
 
   public static <V> UncheckedFuture<V> unchecked(Future<V> future) {
@@ -142,4 +171,16 @@ public class Util {
   public static void pokeball(Throwable pokemon) {
     L.e("carbonite:pokeball", "Gotta catch 'em all!", pokemon);
   }
+
+  public static void closeSilently(Closeable closeable) {
+    if (closeable != null) {
+      try {
+        closeable.close();
+      } catch (IOException th) {
+        L.e("carbonite:io", "Failure closing " + closeable, th);
+      }
+    }
+
+  }
+
 }

@@ -1,5 +1,8 @@
 package info.evelio.carbonite;
 
+import java.io.File;
+import java.io.IOException;
+
 import android.content.Context;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,6 +10,7 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.lang.Exception;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -14,6 +18,10 @@ import java.util.concurrent.TimeoutException;
 
 import static info.evelio.carbonite.Carbonite.CacheType.MEMORY;
 import static info.evelio.carbonite.Carbonite.CacheType.STORAGE;
+
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+
 import static org.fest.assertions.api.Assertions.assertThat;
 
 @RunWith(RobolectricTestRunner.class)
@@ -21,7 +29,6 @@ import static org.fest.assertions.api.Assertions.assertThat;
 public class ReadmeUsageTest {
   public static final String SOMETHING = "something";
   public static final String KEY = "data";
-  private final Context context = Robolectric.application;
 
   @Test public void buildTest() {
     Carbonite carbonite = readmeBuild();
@@ -77,13 +84,27 @@ public class ReadmeUsageTest {
   }
 
   private Carbonite readmeBuild() {
-    return Carbonite.using(context) /* getApplicationContext() is used and not retained */
+    return Carbonite.using( mockContext() ) /* getApplicationContext() is used and not retained */
         .retaining(YourPojo.class)
         .in(MEMORY) /* optional */
         .and(STORAGE) /* optional */
         /* This can be replaced by just build() */
         .iLoveYou() /* Does nothing */
         .iKnow(); // calls build()
+  }
+
+
+  private Context mockContext() {
+    // TODO use Robolectric.application for the rest of needed stuff;
+
+    final Context context = spy(Robolectric.application);
+    try {
+      when(context.getCacheDir()).thenReturn( createTempDirectory() );
+    } catch (Exception e) {
+      throw new RuntimeException("Unable to bind getCacheDir() to a temp dir.", e);
+    }
+    return context;
+
   }
 
   private static YourPojo data() {
@@ -110,5 +131,25 @@ public class ReadmeUsageTest {
       return mData;
     }
 
+  }
+
+  /**
+   * Stolen from http://stackoverflow.com/questions/617414/create-a-temporary-directory-in-java
+   */
+  private static File createTempDirectory()
+      throws IOException {
+    final File temp;
+
+    temp = File.createTempFile("temp", Long.toString(System.nanoTime()));
+
+    if (!temp.delete()) {
+      throw new IOException("Could not delete temp file: " + temp.getAbsolutePath());
+    }
+
+    if (!temp.mkdir()) {
+      throw new IOException("Could not create temp directory: " + temp.getAbsolutePath());
+    }
+
+    return temp;
   }
 }

@@ -1,3 +1,4 @@
+
 sourceSets {
     unitTest {
         java.srcDir file('src/test/java')
@@ -11,6 +12,8 @@ dependencies {
     unitTestCompile 'org.mockito:mockito-core:1.9.5'
     unitTestCompile 'org.robolectric:robolectric:2.1.1'
     unitTestCompile 'com.squareup:fest-android:1.0.5'
+    unitTestCompile 'com.esotericsoftware.kryo:kryo:2.21@jar'
+    unitTestCompile 'com.jakewharton:disklrucache:2.0.2'
 }
 
 

@@ -12,11 +12,12 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-
-}
-
 apply plugin: 'android-library'
+
+dependencies {
+    compile 'com.esotericsoftware.kryo:kryo:2.21@jar'
+    compile 'com.jakewharton:disklrucache:2.0.2'
+}
 
 android {
     compileSdkVersion 17

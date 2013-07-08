@@ -1,6 +1,7 @@
 package info.evelio.carbonite;
 
 import android.content.Context;
+import info.evelio.carbonite.cache.Cache;
 import info.evelio.carbonite.cache.ReferenceCache;
 import info.evelio.carbonite.cache.UnmodifiableCache;
 import info.evelio.carbonite.future.Present;
@@ -10,8 +11,18 @@ import java.util.Set;
 import java.util.concurrent.Future;
 
 import static info.evelio.carbonite.Carbonite.CacheType.MEMORY;
+import static info.evelio.carbonite.Carbonite.CacheType.STORAGE;
 import static info.evelio.carbonite.Carbonite.Defaults.LOAD_FACTOR;
-import static info.evelio.carbonite.Util.*;
+import static info.evelio.carbonite.Util.empty;
+import static info.evelio.carbonite.Util.illegalAccess;
+import static info.evelio.carbonite.Util.illegalState;
+import static info.evelio.carbonite.Util.len;
+import static info.evelio.carbonite.Util.nonEmpty;
+import static info.evelio.carbonite.Util.nonEmptyArg;
+import static info.evelio.carbonite.Util.notNull;
+import static info.evelio.carbonite.Util.notNullArg;
+import static info.evelio.carbonite.Util.obtainValidKey;
+import static info.evelio.carbonite.Util.validateKey;
 
 /*package*/ class CarboniteImp extends Carbonite {
 
@@ -24,7 +35,16 @@ import static info.evelio.carbonite.Util.*;
   // both
   @Override
   public <T> Carbonite set(String key, T value) {
-    illegalState(true, "Unimplemented");
+    if (value == null) {
+      return this;
+    }
+
+    memory(key, value);
+
+    if (cacheFor(STORAGE, value.getClass()) != null) {
+      illegalState(true, "Unimplemented");
+    }
+
     return this;
   }
 
@@ -42,47 +62,62 @@ import static info.evelio.carbonite.Util.*;
 
   @Override
   public <T> Carbonite storage(String key, T value) {
-    illegalState(true, "Unimplemented");
-    return this;
+    return doSet(key, value, STORAGE);
   }
 
   @Override
   public <T> T storage(String key, Class<T> type) {
-    illegalState(true, "Unimplemented");
-    return null;
+    return doGet(key, type, STORAGE);
   }
 
   // memory
 
   @Override
   public <T> Carbonite memory(String key, T value) {
-    validateKey(key);
-
-    notNull(value, "Unable to determinate type of null value.");
-
-    final Cache<String, T> cache = (Cache<String, T>) cacheFor(MEMORY, value.getClass() );
-    cache.set(key, value);
-
-    return this;
+    return doSet(key, value, MEMORY);
   }
 
   @Override
   public <T> T memory(String key, Class<T> type) {
+    return doGet(key, type, MEMORY);
+  }
+
+  private <T> T doGet(String key, Class<T> type, CacheType cacheType) {
     validateKey(key);
 
-    return cacheFor(MEMORY, type).get(key);
+    final Cache<String, T> cache = cacheFor(cacheType, type);
+
+    if (cache == null) {
+      return null;
+    }
+
+    return cache.get(key);
+  }
+
+  private <T> Carbonite doSet(String key, T value, CacheType cacheType) {
+    if (value == null) {
+      return this;
+    }
+
+    validateKey(key);
+
+    final Cache<String, T> cache = (Cache<String, T>) cacheFor(cacheType, value.getClass());
+
+    if (cache != null) {
+      cache.set(key, value);
+    }
+
+    return this;
   }
 
   private <T> Cache<String, T> cacheFor(CacheType cacheType, Class<T> type) {
     final Cache<String, T> cache = mCaches.get( buildKey(cacheType, type) );
-    notNull(cache, "Cache for given type is null, did you include it when retaining(Class)?.");
-
     return cache;
   }
 
   // Building stuff
   private static KeyCache sKeyCache;
-  /*package*/ static final char SEPARATOR = ':';
+  /*package*/ static final char SEPARATOR = '_';
 
   private static String buildKey(CacheType cacheType, Class type) {
     if (sKeyCache == null) {
@@ -100,15 +135,19 @@ import static info.evelio.carbonite.Util.*;
     if (cacheKeys != null) {
       final Cache<Class, String> typeCache = cacheKeys.get(cacheType);
       key = typeCache.get(type);
-      if (isEmpty(key)) {
-        key = buildKey(cacheType, type.getName() );
+      if (empty(key)) {
+        key = buildClassKey(cacheType, type);
         typeCache.set(type, key);
       }
     } else {
-      key = buildKey(cacheType, type.getName() );
+      key = buildClassKey(cacheType, type);
     }
 
     return key;
+  }
+
+  private static String buildClassKey(CacheType cacheType, Class type) {
+    return buildKey(cacheType, obtainValidKey(type));
   }
 
   /*package*/ static String buildKey(CacheType cacheType, String givenKey) {
@@ -165,7 +204,7 @@ import static info.evelio.carbonite.Util.*;
       final int length = len(mOptions);
 
       // This is where we set all our caches
-      final Cache<String, Cache> caches = new ReferenceCache<String, Cache>(length, 1, false);
+      final Cache<String, Cache> caches = new ReferenceCache<String, Cache>(length, 1);
 
       // For every retained class
       for (final Options options : mOptions) {
@@ -188,7 +227,7 @@ import static info.evelio.carbonite.Util.*;
     private final ReferenceCache<CacheType, Cache<Class, String>> mRealCache;
 
     KeyCache() {
-      mRealCache = new ReferenceCache<CacheType, Cache<Class, String>>(CacheType.values().length, 1, false);
+      mRealCache = new ReferenceCache<CacheType, Cache<Class, String>>(CacheType.values().length, 1);
     }
 
     @Override
@@ -197,14 +236,14 @@ import static info.evelio.carbonite.Util.*;
 
       Cache<Class, String> value = mRealCache.get(key);
       if (value == null) {
-        value = new ReferenceCache<Class, String>(1, LOAD_FACTOR, false);
+        value = new ReferenceCache<Class, String>(1, LOAD_FACTOR);
         mRealCache.set(key, value);
       }
       return value;
     }
 
     @Override
-    public Cache<Class, String> set(CacheType key, Cache<Class, String> value) {
+    public Cache<CacheType, Cache<Class, String>> set(CacheType key, Cache<Class, String> value) {
       illegalAccess(true, "Set is not supported as internal values are lazy loaded.");
       return null;
     }

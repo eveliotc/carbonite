@@ -5,8 +5,8 @@ import static info.evelio.carbonite.TestHelper.gimmeReferenceCacheOfOne;
 public class ReferenceCacheTest extends MapCacheTest {
 
   @Override
-  protected MapCache<String, String> gimmeCacheOfOne(boolean nullAllowed) {
-    return gimmeReferenceCacheOfOne(nullAllowed);
+  protected MapCache<String, String> gimmeCacheOfOne() {
+    return gimmeReferenceCacheOfOne();
   }
 
 }

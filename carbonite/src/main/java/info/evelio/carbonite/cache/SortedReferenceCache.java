@@ -8,8 +8,8 @@ import java.util.TreeMap;
  */
 public class SortedReferenceCache<K, V> extends MapCache<K, V> {
 
-  public SortedReferenceCache(int capacity, float loadFactor, boolean nullValues) {
-    super(capacity, loadFactor, nullValues);
+  public SortedReferenceCache(int capacity, float loadFactor) {
+    super(capacity, loadFactor);
   }
 
   @Override

@@ -8,8 +8,8 @@ import java.util.Map;
  */
 public class ReferenceCache<K, V> extends MapCache<K, V> {
 
-  public ReferenceCache(int capacity, float loadFactor, boolean nullValues) {
-    super(capacity, loadFactor, nullValues);
+  public ReferenceCache(int capacity, float loadFactor) {
+    super(capacity, loadFactor);
   }
 
   @Override

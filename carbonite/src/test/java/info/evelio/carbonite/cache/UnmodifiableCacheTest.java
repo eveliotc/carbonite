@@ -12,18 +12,18 @@ public class UnmodifiableCacheTest {
   }
 
   @Test public void testNotNullHappy() {
-    final ReferenceCache<Object, Object> notNullCache = gimmeReferenceCacheOfOne(false);
+    final ReferenceCache<Object, Object> notNullCache = gimmeReferenceCacheOfOne();
     unmodifiable( notNullCache );
   }
 
   @Test (expected = Throwable.class) public void testUnmodifiableIsUnmodifiable() {
-    final ReferenceCache<Object, Object> notNullCache = gimmeReferenceCacheOfOne(false);
+    final ReferenceCache<Object, Object> notNullCache = gimmeReferenceCacheOfOne();
     final UnmodifiableCache<Object, Object> unmodifiable = unmodifiable(notNullCache);
     unmodifiable.set("something", "here");
   }
 
   @Test public void testUnmodifiableCanRetrieve() {
-    final ReferenceCache<Object, Object> notNullCache = gimmeReferenceCacheOfOne(false);
+    final ReferenceCache<Object, Object> notNullCache = gimmeReferenceCacheOfOne();
     notNullCache.set("something", "here");
     final UnmodifiableCache<Object, Object> unmodifiable = unmodifiable(notNullCache);
     assertEquals("here", unmodifiable.get("something"));
