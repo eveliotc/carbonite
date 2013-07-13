@@ -30,6 +30,9 @@ local.properties
 build
 lib
 
+# maven
+target
+
 # logs
 *.log
 
