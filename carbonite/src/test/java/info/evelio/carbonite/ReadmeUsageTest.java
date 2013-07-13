@@ -1,8 +1,5 @@
 package info.evelio.carbonite;
 
-import java.io.File;
-import java.io.IOException;
-
 import android.content.Context;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,7 +7,8 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import java.lang.Exception;
+import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -18,11 +16,9 @@ import java.util.concurrent.TimeoutException;
 
 import static info.evelio.carbonite.Carbonite.CacheType.MEMORY;
 import static info.evelio.carbonite.Carbonite.CacheType.STORAGE;
-
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-
-import static org.fest.assertions.api.Assertions.assertThat;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE)
@@ -116,7 +112,7 @@ public class ReadmeUsageTest {
     assertThat(data.getData()).isEqualTo(expected);
   }
 
-  private static class YourPojo {
+  public static class YourPojo {
     private final String mData;
 
     public YourPojo() {

@@ -7,15 +7,20 @@ A simple in memory and persistent `Object` cache for Android.
 
 <hr/>
 
-Carbonite aims to deal with your data POJOs (JavaBeans folks anyone?) without boilerplate code, so you can forgforgetuet about ORMs, SQLite, `Cursor`s, `ContentProvider`s, etc. for data that you already hold in `Object`s anyways.
+Carbonite aims to deal with your data POJOs (JavaBeans folks anyone?) without boilerplate code, so you can forget about
+ORMs, SQLite, `Cursor`s, `ContentProvider`s, etc. for data that you already hold in `Object`s anyways.
 
-Although it can be used as the only persistence solution on Android, *it is not* one of carbonite goals to do so, you should evaluate when traditional persistence solutions make more sense based on your problem.
+Although it can be used as the only persistence solution on Android, *it is not* one of carbonite goals to do so,
+you should evaluate when traditional persistence solutions make more sense based on your problem.
 
-**Note**: Carbonite is currently under heavy first version development so API and stuff might change among versions, please bear with us.
+**Note**: Carbonite is currently under heavy first version development so API and stuff might change among versions,
+please bear with us.
 
 ### How does it work?
 
-Carbonite keeps your POJOs in memory while transparently persisting them in background to storage, you can retrieve them later either from memory or loading them asynchronously/synchronously from storage.
+Carbonite keeps your POJOs in memory while transparently persisting them in background to storage, you can retrieve them
+ later either from memory or loading them asynchronously/synchronously from storage. You can specify how and how long
+ are them kept, for finer control you can provide your own implementations.
 
 ### Usage
 1. Include it in your project. 

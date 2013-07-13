@@ -95,6 +95,7 @@ public class StorageLruCache<T> implements Cache<String, T> {
       if (!success) {
         throw new IOException("Serializer failed to write.");
       }
+      editor.commit();
     } catch (IOException e) {
       e(e, "Unable to set key %s to %s of type %s ", key, value, mType);
       try {
