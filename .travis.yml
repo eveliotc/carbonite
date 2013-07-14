@@ -6,13 +6,27 @@ branches:
 
 notifications:
   email: false
+  
+env:
+  global:
+    - ANDROID_SDK_VERSION="r22.0.1"
+    
+jdk:
+  - openjdk7
 
 before_install:
-  - wget http://dl.google.com/android/android-sdk_r22.0.1-linux.tgz
-  - tar -zxf android-sdk_r22.0.1-linux.tgz
-  - export ANDROID_HOME=~/builds/eveliotc/carbonite/android-sdk-linux
-  - export PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
+  # Update a system for ia32 libraries
+  # Just full upgrade of system and installing a ia32-libs not works
+  # It's debian based system, /very/ stable version only
+  - sudo apt-get update -qq
+  - if [ `uname -m` = x86_64 ]; then sudo apt-get install -qq --force-yes libgd2-xpm ia32-libs ia32-libs-multiarch; fi
+  # Android
+  - wget http://dl.google.com/android/android-sdk_${ANDROID_SDK_VERSION}-linux.tgz
+  - tar -zxf android-sdk_${ANDROID_SDK_VERSION}-linux.tgz
+  - export ANDROID_HOME==`pwd`/android-sdk-linux
+  - export ANDROID_BUILD_TOOLS_HOME=${ANDROID_HOME}/build-tools/17.0.0
+  - export PATH=${ANDROID_BUILD_TOOLS_HOME}:${ANDROID_HOME}/tools:${PATH}
   - TOOLS=$(android list sdk --no-ui | grep "Android SDK Platform-tools" | cut -d"-" -f1)
   - android update sdk --filter "$TOOLS" --no-ui --force
-  - SDK=$(android list sdk --no-ui | grep ", API 16," | cut -d"-" -f1)
+  - SDK=$(android list sdk --no-ui | grep ", API 17," | cut -d"-" -f1)
   - android update sdk --filter "$SDK" --no-ui --force
