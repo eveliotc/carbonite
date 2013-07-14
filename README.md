@@ -16,6 +16,8 @@ you should evaluate when traditional persistence solutions make more sense based
 **Note**: Carbonite is currently under heavy first version development so API and stuff might change among versions,
 please bear with us.
 
+[![Build Status](https://travis-ci.org/eveliotc/carbonite?branch=develop)](https://travis-ci.org/eveliotc/carbonite)
+
 ### How does it work?
 
 Carbonite keeps your POJOs in memory while transparently persisting them in background to storage, you can retrieve them
