@@ -8,7 +8,7 @@ A simple in memory and persistent `Object` cache for Android.
 <hr/>
 
 Carbonite aims to deal with your data POJOs (JavaBeans folks anyone?) without boilerplate code, so you can forget about
-ORMs, SQLite, `Cursor`s, `ContentProvider`s, etc. for data that you already hold in `Object`s anyways.
+ORMs, SQLite, `Cursor`s, `ContentProvider`s, etc. for data that you already hold in `Object`s anyways, plus you want them evicted at some point therefore losing them is not really a big deal, yet you can control how that will happen.
 
 Although it can be used as the only persistence solution on Android, *it is not* one of carbonite goals to do so,
 you should evaluate when traditional persistence solutions make more sense based on your problem.
@@ -21,6 +21,10 @@ please bear with us.
 Carbonite keeps your POJOs in memory while transparently persisting them in background to storage, you can retrieve them
  later either from memory or loading them asynchronously/synchronously from storage. You can specify how and how long
  are them kept, for finer control you can provide your own implementations.
+ 
+Current implementations vary, all of them are stale values prone if you do not properly use them.
+
+`TODO provide docs regarding current implementations and how to use them, etc.`
 
 ### Usage
 1. Include it in your project. 
@@ -31,8 +35,8 @@ Carbonite keeps your POJOs in memory while transparently persisting them in back
 ```java
   Carbonite.using(context) /* getApplicationContext() is used and not retained */
         .retaining(YourPojo.class)
-        .in(MEMORY) /* optional */
-        .and(STORAGE) /* optional */
+        .in(MEMORY) /* optional, default */
+        .and(STORAGE) /* optional if you don't want to keep in memory */
         /* This can be replaced by just build() */
         .iLoveYou() /* Does nothing */
         .iKnow(); // calls build()
@@ -43,30 +47,34 @@ Carbonite keeps your POJOs in memory while transparently persisting them in back
 ```java
   YourPojo data = …
   ...
-  carbonite.set("data", data); // will keep it in memory and storage
+  carbonite.set("data", data); // will keep it in memory and async persist it to storage
 ```
-You can also use `memory` and `storage`.
+You can also use `memory` and `storage` for a blocking way.
 ##### get
 From memory:
 ```java
   YourPojo stored = carbonite.memory("data", YourPojo.class);
 ```
-From storage:
+From storage (blocking):
 ```java
   YourPojo stored = carbonite.storage("data", YourPojo.class);
 ```
-From memory or storage:
+From memory (blocking) or storage (async):
 ```java
   Future<YourPojo> future = carbonite.get("data", YourPojo.class);
   …
   YourPojo stored = future.get();
 ```
 
+**Notes**:
+
+- `MEMORY` operations will always happen in calling thread as often will be as simple as `put`/`get` an item in/from a `Map`, while `STORAGE` operations happen asynchronously for `set` and `get` and are blocking for `storage` calls.
+
+
 ### Goals
 - Simplicity (DRY, YAGNI, etc.)
 - Zero boilerplate code
 - Fast
-- Reliable
 - Dependencies free
 - Optimized for Android
 - Easy and fun to use
@@ -77,17 +85,16 @@ This is a raw short term roadmap of features that I'd like to see in Carbonite:
 
 - A sample app (in progress)
 - Optional unsafe `get`, `retaining`, etc. methods without `Class` param.
-- Future listeners
+- Help with Carbonite instances hold by life cycle objects (`Fragment`, `Activity`, etc.).
+- Future listeners so we can remove `Future` boilerplate, allow callback cleanup for objects with life cycles like 
 - Auto keys (in POJO -interface, annotations, code generation, `hashCode()` maybe baby- or using a third object to provide it)
 - Bulk operations
 - Eviction (allow using weigher, etc. for auto eviction)
 - CRUD notifications (e.g. using listeners or events)
-- Auto update references
+- Auto update references (to deal with stale objects)
 - Object pooling
 - Stats
-- Help with Carbonite instances hold by life cycle objects (`Fragment`, `Activity`, etc.).
 - Allow more cache (in memory/storage TTL, references, etc.) and serialization (JSON, Java Serialization, etc.) implementations.
-
 
 ### About
 Brought to you by the Carbonite contributors specially [this guy](http://gplus.to/eveliotc).
