@@ -204,7 +204,7 @@ import static info.evelio.carbonite.util.Util.validateKey;
   }
 
   // Building stuff
-  private static KeyCache sKeyCache;
+  private static volatile KeyCache sKeyCache;
   /*package*/ static final char SEPARATOR = '_';
 
   private static String buildKey(CacheType cacheType, Class type) {
