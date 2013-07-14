@@ -39,16 +39,20 @@
 
     <!-- Checks for Naming Conventions.                  -->
     <!-- See http://checkstyle.sf.net/config_naming.html -->
-    <!--<module name="ConstantName"/>-->
+    <module name="ConstantName"/>
     <module name="LocalFinalVariableName"/>
     <module name="LocalVariableName"/>
-    <module name="MemberName"/>
+    <module name="MemberName">
+      <property name="format" value="^m[A-Z][a-zA-Z0-9]*$"/>
+    </module>
     <module name="MethodName">
       <property name="format" value="^[a-z][a-zA-Z0-9_]*$"/>
     </module>
     <module name="PackageName"/>
     <module name="ParameterName"/>
-    <module name="StaticVariableName"/>
+    <module name="StaticVariableName">
+      <property name="format" value="^s[A-Z][a-zA-Z0-9]*$"/>
+    </module>
     <module name="TypeName"/>
 
 
@@ -91,24 +95,19 @@
 
     <!-- Checks for blocks. You know, those {}'s         -->
     <!-- See http://checkstyle.sf.net/config_blocks.html -->
-    <!--module name="AvoidNestedBlocks"/-->
-    <!--module name="EmptyBlock"/-->
+    <module name="AvoidNestedBlocks"/>
+    <module name="EmptyBlock"/>
     <module name="LeftCurly"/>
-    <!--module name="NeedBraces"/-->
+    <module name="NeedBraces"/>
     <module name="RightCurly"/>
 
 
     <!-- Checks for common coding problems               -->
     <!-- See http://checkstyle.sf.net/config_coding.html -->
-    <!--module name="AvoidInlineConditionals"/-->
     <module name="CovariantEquals"/>
     <module name="EmptyStatement"/>
-    <!--<module name="EqualsAvoidNull"/>-->
     <module name="EqualsHashCode"/>
-    <!--module name="HiddenField"/-->
     <module name="IllegalInstantiation"/>
-    <!--<module name="InnerAssignment"/>-->
-    <!--module name="MagicNumber"/-->
     <module name="MissingSwitchDefault"/>
     <module name="RedundantThrows"/>
     <module name="SimplifyBooleanExpression"/>
@@ -116,11 +115,10 @@
 
     <!-- Checks for class design                         -->
     <!-- See http://checkstyle.sf.net/config_design.html -->
-    <!--module name="DesignForExtension"/-->
-    <!--module name="FinalClass"/-->
-    <!--module name="HideUtilityClassConstructor"/-->
-    <!--module name="InterfaceIsType"/-->
-    <!--module name="VisibilityModifier"/-->
+    <module name="FinalClass"/>
+    <module name="HideUtilityClassConstructor"/>
+    <module name="InterfaceIsType"/>
+    <module name="VisibilityModifier"/>
 
 
     <!-- Miscellaneous other checks.                   -->
@@ -130,4 +128,11 @@
     <!--module name="TodoComment"/-->
     <module name="UpperEll"/>
   </module>
+
+  <module name="Header">
+    <property name="headerFile" value="../extra/java.header"/>
+    <property name="fileExtensions" value="java"/>
+    <property name="charset" value="utf-8"/>
+  </module>
+
 </module>
