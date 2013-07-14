@@ -16,34 +16,35 @@
  */
 package info.evelio.carbonite.cache;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
- * A {@link HashMap} implementation of {@link MapCache}
+ * A cache that uses {@link WeakHashMap} ensuring to release keys and values when keys are GC approachable
+ * @param <K>
+ * @param <V>
  */
-public class ReferenceCache<K, V> extends MapCache<K, V> {
+public class WeakKeyCache<K, V> extends MapCache<K, V> {
 
-  public ReferenceCache(Options opts) {
+  public WeakKeyCache(Options opts) {
     super(opts);
   }
 
   @Override
   protected Map<K, V> onCreateMap(MapCache.Options options) {
     final Options opts = (Options) options;
-    return new HashMap<K, V>(opts.initialCapacity(), opts.loadFactor());
+    return new WeakHashMap<K, V>(opts.initialCapacity(), opts.loadFactor());
   }
 
-  public static class Options extends MapCache.CapacityLoadOptions<ReferenceCache> {
+  public static class Options extends MapCache.CapacityLoadOptions<WeakKeyCache> {
 
     public Options(int initialCapacity, float loadFactor) {
       super(initialCapacity, loadFactor);
     }
 
     @Override
-    public Class<? extends ReferenceCache> imp() {
-      return ReferenceCache.class;
+    public Class<? extends WeakKeyCache> imp() {
+      return WeakKeyCache.class;
     }
   }
-
 }

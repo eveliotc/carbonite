@@ -21,6 +21,7 @@ import info.evelio.carbonite.cache.Cache;
 import info.evelio.carbonite.cache.CacheType;
 import info.evelio.carbonite.cache.ReferenceCache;
 import info.evelio.carbonite.cache.UnmodifiableCache;
+import info.evelio.carbonite.cache.WeakKeyCache;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashSet;
@@ -296,11 +297,15 @@ import static info.evelio.carbonite.util.Util.validateKey;
     return new ReferenceCache<K, V>(opts);
   }
 
+  private static <K, V> WeakKeyCache<K, V> buildWeakKeyCache(int initialCapacity) {
+    final WeakKeyCache.Options opts = new WeakKeyCache.Options(initialCapacity, LOAD_FACTOR);
+    return new WeakKeyCache<K, V>(opts);
+  }
+
   /*package*/ static class KeyCache implements Cache<CacheType, Cache<Class, String>> {
     private final ReferenceCache<CacheType, Cache<Class, String>> mRealCache;
 
     KeyCache() {
-      // TODO Use a weak reference cache
       mRealCache = buildReferenceCache(CacheType.values().length);
     }
 
@@ -310,7 +315,7 @@ import static info.evelio.carbonite.util.Util.validateKey;
 
       Cache<Class, String> value = mRealCache.get(key);
       if (value == null) {
-        value = buildReferenceCache(1);
+        value = buildWeakKeyCache(1);
         mRealCache.set(key, value);
       }
       return value;

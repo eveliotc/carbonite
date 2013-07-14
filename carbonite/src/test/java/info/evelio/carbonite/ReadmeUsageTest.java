@@ -107,8 +107,6 @@ public class ReadmeUsageTest {
 
 
   private Context mockContext() {
-    // TODO use Robolectric.application for the rest of needed stuff;
-
     final Context context = spy(Robolectric.application);
     try {
       when(context.getCacheDir()).thenReturn( createTempDirectory() );
