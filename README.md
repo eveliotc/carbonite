@@ -83,18 +83,22 @@ From memory (blocking) or storage (async):
 ### Roadmap
 This is a raw short term roadmap of features that I'd like to see in Carbonite:
 
+- Document all the `public` APIs
 - A sample app (in progress)
-- Optional unsafe `get`, `retaining`, etc. methods without `Class` param.
 - Help with Carbonite instances hold by life cycle objects (`Fragment`, `Activity`, etc.).
-- Future listeners so we can remove `Future` boilerplate, allow callback cleanup for objects with life cycles like 
+- Future listeners so we can remove `Future` boilerplate, allow callback cleanup for objects with life cycles like the ones mentioned above.
 - Auto keys (in POJO -interface, annotations, code generation, `hashCode()` maybe baby- or using a third object to provide it)
 - Bulk operations
 - Eviction (allow using weigher, etc. for auto eviction)
+  - Some cache implemenations (Like LRU or weak referenced ones) already do this based it is own rules.
 - CRUD notifications (e.g. using listeners or events)
 - Auto update references (to deal with stale objects)
 - Object pooling
 - Stats
-- Allow more cache (in memory/storage TTL, references, etc.) and serialization (JSON, Java Serialization, etc.) implementations.
+- Add more cache (in memory/storage TTL, references, etc.) and serialization (JSON, Java Serialization, etc.) implementations.
+  - You can provide your own using a `CacheFactory` or providing `CacheOptions` on build time.
+  - For `StorageLruCache` you can provide your own `Serializer` using `StorageLruCache.Options`.
+- Optional unsafe `get`, `retaining`, etc. methods without `Class` param.
 
 ### About
 Brought to you by the Carbonite contributors specially [this guy](http://gplus.to/eveliotc).
