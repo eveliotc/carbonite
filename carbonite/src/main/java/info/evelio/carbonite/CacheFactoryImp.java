@@ -34,6 +34,7 @@ import static info.evelio.carbonite.CarboniteApi.CacheBuilder;
 import static info.evelio.carbonite.cache.StorageLruCache.MINIMAL_CAPACITY;
 import static info.evelio.carbonite.cache.StorageLruCache.Options;
 import static info.evelio.carbonite.util.Util.illegalState;
+import static info.evelio.carbonite.util.Util.newCacheInstance;
 import static info.evelio.carbonite.util.Util.notNull;
 import static info.evelio.carbonite.util.Util.notNullArg;
 import static info.evelio.carbonite.util.Util.obtainValidKey;
@@ -42,25 +43,26 @@ import static info.evelio.carbonite.util.Util.obtainValidKey;
   /*package*/ static final CacheFactoryImp INSTANCE = new CacheFactoryImp();
 
   @Override
-  public Cache<String, T> build(CacheBuilder options) {
-    notNullArg(options, "Invalid options given.");
+  public Cache<String, T> build(CacheBuilder cacheBuilder) {
+    notNullArg(cacheBuilder, "Invalid cache builder given.");
 
-    final CacheOptions opts = options.opts();
-    if (opts != null) {
-      illegalState(true, "Using options instantiation not yet implemented.");
+    Cache<String, T> fromOpts = buildFromOpts(cacheBuilder);
+    if (fromOpts != null) {
+      return fromOpts;
     }
+    // Generate defaults:
+    return buildDefault(cacheBuilder);
+  }
 
-    if (opts != null && opts.imp() != null) {
-      illegalState(true, "Implementation instantiation not yet implemented.");
-    }
-
+  @SuppressWarnings("unchecked")
+  private Cache<String, T> buildDefault(CacheBuilder options) {
     final CacheType cacheType = options.cacheType();
 
     switch (cacheType) {
       case MEMORY:
         return new MemoryLruCache<String, T>(new MemoryLruCache.Options(LRU_SIZE));
       case STORAGE:
-        // TODO yikes a builder or something
+        // TODO yikes a builder or something, plus kryo needs more config
         final Class type = options.type();
         final File dir = buildCacheDir(options.context(), type);
         final Serializer<T> serializer = new KryoSerializer<T>(new Kryo(), type);
@@ -70,6 +72,24 @@ import static info.evelio.carbonite.util.Util.obtainValidKey;
         illegalState(true, "Not yet implemented cache type " + cacheType);
         return null;
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  private Cache<String, T> buildFromOpts(CacheBuilder builder) {
+    final CacheOptions opts = builder.opts();
+
+    if (opts == null) {
+      return null;
+    }
+
+    final Class<? extends Cache> type = opts.imp();
+
+    final Cache<String, T> instance = newCacheInstance(type, opts);
+
+    illegalState(!type.isInstance(instance),
+        "Unable to instantiate cache, make sure it has a public constructor with proper options type.");
+
+    return instance;
   }
 
   private static File buildCacheDir(Context context, Class type) {

@@ -16,11 +16,14 @@
  */
 package info.evelio.carbonite.util;
 
+import info.evelio.carbonite.cache.Cache;
+import info.evelio.carbonite.cache.CacheOptions;
 import info.evelio.carbonite.future.Present;
 import info.evelio.carbonite.future.UncheckedFuture;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
@@ -185,6 +188,7 @@ public final class Util {
     illegalState(empty(map), msg);
   }
 
+  @SuppressWarnings("unchecked")
   public static <V> UncheckedFuture<V> unchecked(Future<V> future) {
     return new UncheckedFuture(future);
   }
@@ -208,6 +212,7 @@ public final class Util {
 
   }
 
+  @SuppressWarnings("unchecked")
   public static <T> Class<T> checkedClass(T value) {
     return (Class<T>) value.getClass();
   }
@@ -222,4 +227,16 @@ public final class Util {
         new SynchronousQueue<Runnable>(),
         threadFactory);
   }
+
+  @SuppressWarnings("unchecked")
+  public static <K, V> Cache<K, V> newCacheInstance(Class<? extends Cache> imp, CacheOptions opts) {
+    try {
+      final Constructor constructor = imp.getConstructor(opts.getClass());
+      return (Cache<K, V>) constructor.newInstance(opts);
+    } catch (Exception e) {
+      L.e("carbonite:newCacheInstance", "Unable to instantiate " + imp + " with " + opts, e);
+    }
+    return null;
+  }
+
 }

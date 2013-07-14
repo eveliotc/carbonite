@@ -25,6 +25,7 @@ import static info.evelio.carbonite.Carbonite.Defaults.FACTORY;
 import static info.evelio.carbonite.Carbonite.Defaults.TYPE;
 import static info.evelio.carbonite.CarboniteApi.CacheBuilder;
 import static info.evelio.carbonite.CarboniteApi.CarboniteBuilder;
+import static info.evelio.carbonite.util.Util.illegalArg;
 import static info.evelio.carbonite.util.Util.notNullArg;
 
 /*package*/ abstract class CarboniteBuilderBaseImp implements CarboniteBuilder {
@@ -100,6 +101,9 @@ import static info.evelio.carbonite.util.Util.notNullArg;
     @Override
     public CacheBuilder use(CacheOptions opts) {
       notNullArg(opts, "You must provide valid options.");
+      notNullArg(opts.cacheType(), "You must provide valid options with proper cache type (cacheType).");
+      illegalArg(opts.cacheType() != mIn, "Cache options are not compatible with target cache type (cacheType != in).");
+      notNullArg(opts.imp(), "You must provide valid options with proper cache implementation (imp).");
 
       mOpts = opts;
 

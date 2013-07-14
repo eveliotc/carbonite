@@ -18,15 +18,55 @@ package info.evelio.carbonite.util;
 
 import info.evelio.carbonite.cache.Cache;
 import info.evelio.carbonite.cache.ReferenceCache;
+import info.evelio.carbonite.cache.StorageLruCache;
 import info.evelio.carbonite.cache.UnmodifiableCache;
+import info.evelio.carbonite.serialization.Serializer;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Comparator;
 
 public class TestHelper {
+
+  @SuppressWarnings("unchecked") // to avoid Comparable<Comparable<Comparable<...>>>
+  public static final Comparator<Comparable> NATURAL_ORDER = new Comparator<Comparable>() {
+    public int compare(Comparable a, Comparable b) {
+      return a.compareTo(b);
+    }
+  };
+
   public static <K, V> ReferenceCache<K, V> gimmeReferenceCacheOfOne() {
     return new ReferenceCache<K, V>(new ReferenceCache.Options(1, 1));
   }
 
   public static <K, V> UnmodifiableCache<K, V> unmodifiable(Cache<K, V> cache) {
     return new UnmodifiableCache<K, V>(cache);
+  }
+
+  public static StorageLruCache.Options generateStorageLruCacheOpts() {
+    File dir;
+    try {
+      dir = File.createTempFile("temp", ".dir");
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+
+    final StorageLruCache.Options storageOpts = new StorageLruCache.Options(dir, 0, Object.class, new NoOpSerializer());
+    return storageOpts;
+  }
+
+  private static class NoOpSerializer implements Serializer {
+    @Override
+    public Object read(InputStream in) {
+      return null;
+    }
+
+    @Override
+    public boolean write(OutputStream out, Object value) {
+      return false;
+    }
   }
 
 }

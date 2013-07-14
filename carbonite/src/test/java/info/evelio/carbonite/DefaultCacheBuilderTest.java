@@ -29,7 +29,7 @@ import org.robolectric.annotation.Config;
 import static info.evelio.carbonite.CarboniteApi.CacheBuilder;
 import static info.evelio.carbonite.CarboniteApi.CarboniteBuilder;
 import static info.evelio.carbonite.CarboniteBuilderBaseImp.DefaultCacheBuilder;
-import static info.evelio.carbonite.cache.CacheType.STORAGE;
+import static info.evelio.carbonite.cache.CacheType.MEMORY;
 import static info.evelio.carbonite.cache.ReferenceCache.Options;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -69,12 +69,12 @@ public class DefaultCacheBuilderTest {
 
     final Options opts = new Options(1, 1);
     final CacheBuilder cacheBuilder = new DefaultCacheBuilder(builder, CLASS_TO_RETAIN)
-        .in(STORAGE)
+        .in(MEMORY)
         .use(opts)
         .use(factory);
 
     assertThat(cacheBuilder.builder()).isEqualTo(builder);
-    assertThat(cacheBuilder.cacheType()).isEqualTo(STORAGE);
+    assertThat(cacheBuilder.cacheType()).isEqualTo(MEMORY);
     assertThat(cacheBuilder.opts()).isEqualTo(opts);
     // Couldn't find something to compare as most of classes will fail to compile
     assertThat(cacheBuilder.opts().imp() == ReferenceCache.class).isTrue();

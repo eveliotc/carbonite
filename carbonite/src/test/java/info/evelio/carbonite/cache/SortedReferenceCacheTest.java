@@ -16,15 +16,9 @@
  */
 package info.evelio.carbonite.cache;
 
-import java.util.Comparator;
+import static info.evelio.carbonite.util.TestHelper.NATURAL_ORDER;
 
 public class SortedReferenceCacheTest extends MapCacheTest {
-  @SuppressWarnings("unchecked") // to avoid Comparable<Comparable<Comparable<...>>>
-  private static final Comparator<Comparable> NATURAL_ORDER = new Comparator<Comparable>() {
-    public int compare(Comparable a, Comparable b) {
-      return a.compareTo(b);
-    }
-  };
 
   @Override @SuppressWarnings("unchecked")
   protected MapCache<String, String> gimmeCacheOfOne() {
