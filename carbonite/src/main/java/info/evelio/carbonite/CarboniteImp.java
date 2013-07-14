@@ -4,32 +4,42 @@ import android.content.Context;
 import info.evelio.carbonite.cache.Cache;
 import info.evelio.carbonite.cache.ReferenceCache;
 import info.evelio.carbonite.cache.UnmodifiableCache;
-import info.evelio.carbonite.future.Present;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 
+import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
+import static android.os.Process.setThreadPriority;
 import static info.evelio.carbonite.Carbonite.CacheType.MEMORY;
 import static info.evelio.carbonite.Carbonite.CacheType.STORAGE;
 import static info.evelio.carbonite.Carbonite.Defaults.LOAD_FACTOR;
+import static info.evelio.carbonite.Carbonite.Defaults.THREADS;
+import static info.evelio.carbonite.Util.checkedClass;
 import static info.evelio.carbonite.Util.empty;
 import static info.evelio.carbonite.Util.illegalAccess;
-import static info.evelio.carbonite.Util.illegalState;
+import static info.evelio.carbonite.Util.illegalArg;
 import static info.evelio.carbonite.Util.len;
 import static info.evelio.carbonite.Util.nonEmpty;
 import static info.evelio.carbonite.Util.nonEmptyArg;
 import static info.evelio.carbonite.Util.notNull;
 import static info.evelio.carbonite.Util.notNullArg;
 import static info.evelio.carbonite.Util.obtainValidKey;
+import static info.evelio.carbonite.Util.present;
 import static info.evelio.carbonite.Util.validateKey;
 
 /*package*/ class CarboniteImp extends Carbonite {
 
   private final Cache<String, Cache> mCaches;
+  private final ExecutorService mExecutor; // TODO this should be static
 
-  public CarboniteImp(Cache<String, Cache> caches) {
+  /*package*/ CarboniteImp(Cache<String, Cache> caches, ExecutorService executor) {
     mCaches = new UnmodifiableCache<String, Cache>(caches);
+    mExecutor = executor;
   }
 
   // both
@@ -41,21 +51,21 @@ import static info.evelio.carbonite.Util.validateKey;
 
     memory(key, value);
 
-    if (cacheFor(STORAGE, value.getClass()) != null) {
-      illegalState(true, "Unimplemented");
-    }
+    later(ACTION.SET, key, value, cacheFor(STORAGE, checkedClass(value)));
 
     return this;
   }
 
   @Override
   public <T> Future<T> get(String key, Class<T> type) {
+
     final T memoryResult = memory(key, type);
+
     if (memoryResult != null) {
-      return new Present(memoryResult);
+      return present(memoryResult);
     }
-    illegalState(true, "Unimplemented");
-    return null;
+
+    return later(ACTION.GET, key, null, cacheFor(STORAGE, type));
   }
 
   // storage
@@ -101,7 +111,7 @@ import static info.evelio.carbonite.Util.validateKey;
 
     validateKey(key);
 
-    final Cache<String, T> cache = (Cache<String, T>) cacheFor(cacheType, value.getClass());
+    final Cache<String, T> cache = cacheFor(cacheType, checkedClass(value));
 
     if (cache != null) {
       cache.set(key, value);
@@ -113,6 +123,64 @@ import static info.evelio.carbonite.Util.validateKey;
   private <T> Cache<String, T> cacheFor(CacheType cacheType, Class<T> type) {
     final Cache<String, T> cache = mCaches.get( buildKey(cacheType, type) );
     return cache;
+  }
+
+  // Async stuff
+  private enum ACTION { SET, GET };
+
+  private <T> Future<T> later(ACTION action, String key, T value, Cache<String, T> cache) {
+    notNullArg(action, "No action given.");
+
+    // Optimization: don't validate or send to execution if we are setting null
+    if (value == null && action == ACTION.SET) {
+      return null; // EEE: We don't use futures for set, we might at some point when listeners are needed
+    }
+
+    validateKey(key);
+
+    // TODO allow only unique ACTIONS, if we are setting/getting certain key multiple times submit just once
+    switch (action) {
+      case SET:
+        return (Future<T>) mExecutor.submit( new SetTask(key, value, cache) );
+      case GET:
+        return mExecutor.submit( new GetTask(key, cache) );
+      default:
+        illegalArg(true, "Unknown action " + action);
+        return null;
+    }
+
+  }
+
+  private static class SetTask<T> implements Runnable {
+    private final String mKey;
+    private final T mValue;
+    private final Cache<String, T>  mCache;
+
+    private SetTask(String key, T value, Cache<String, T> cache) {
+      mKey = key;
+      mValue = value;
+      mCache = cache;
+    }
+
+    @Override
+    public void run() {
+      mCache.set(mKey, mValue);
+    }
+  }
+
+  private static class GetTask<T> implements Callable<T> {
+    private final String mKey;
+    private final Cache<String, T>  mCache;
+
+    private GetTask(String key, Cache<String, T> cache) {
+      mKey = key;
+      mCache = cache;
+    }
+
+    @Override
+    public T call() throws Exception {
+      return mCache.get(mKey);
+    }
   }
 
   // Building stuff
@@ -218,7 +286,7 @@ import static info.evelio.carbonite.Util.validateKey;
         caches.set(buildKey(cacheType, type), built); // alrite let's cache it!
       }
 
-      return new CarboniteImp( caches );
+      return new CarboniteImp( caches, Util.newFixedCachedThread(THREADS, new CarboniteThreadFactory()) );
     }
 
   }
@@ -246,6 +314,28 @@ import static info.evelio.carbonite.Util.validateKey;
     public Cache<CacheType, Cache<Class, String>> set(CacheType key, Cache<Class, String> value) {
       illegalAccess(true, "Set is not supported as internal values are lazy loaded.");
       return null;
+    }
+  }
+
+  /*package*/ static class CarboniteThreadFactory implements ThreadFactory {
+
+    @NotNull
+    @Override
+    public Thread newThread(Runnable r) {
+      return new CarboniteThread(r);
+    }
+  }
+
+  /*package*/ static class CarboniteThread extends Thread {
+    public CarboniteThread(Runnable r) {
+      super(r);
+      setName("CarboniteBg");
+    }
+
+    @Override
+    public void run() {
+      setThreadPriority(THREAD_PRIORITY_BACKGROUND);
+      super.run();
     }
   }
 

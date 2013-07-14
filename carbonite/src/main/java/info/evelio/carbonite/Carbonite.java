@@ -13,6 +13,7 @@ public abstract class Carbonite implements CarboniteApi {
     public static final CacheType TYPE = CacheType.MEMORY;
     public static final CacheFactory FACTORY = CacheFactoryImp.INSTANCE;
     public static final String STORAGE_DIRECTORY_NAME = Carbonite.class.getSimpleName();
+    public static final int THREADS = 4;
   }
 
   public enum CacheType {

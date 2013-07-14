@@ -1,5 +1,6 @@
 package info.evelio.carbonite;
 
+import info.evelio.carbonite.future.Present;
 import info.evelio.carbonite.future.UncheckedFuture;
 
 import java.io.Closeable;
@@ -7,7 +8,12 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -183,4 +189,18 @@ public class Util {
 
   }
 
+  public static <T> Class<T> checkedClass(T value) {
+    return (Class<T>) value.getClass();
+  }
+
+  public static <T> Future<T> present(T result) {
+    return new Present<T>(result);
+  }
+
+  public static ExecutorService newFixedCachedThread(int threads, ThreadFactory threadFactory) {
+    return new ThreadPoolExecutor(0, threads,
+        60L, TimeUnit.SECONDS,
+        new SynchronousQueue<Runnable>(),
+        threadFactory);
+  }
 }
