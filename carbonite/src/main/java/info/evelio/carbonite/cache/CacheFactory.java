@@ -16,8 +16,8 @@
  */
 package info.evelio.carbonite.cache;
 
-import static info.evelio.carbonite.CarboniteBuilder.Options;
+import static info.evelio.carbonite.CarboniteApi.CacheBuilder;
 
 public interface CacheFactory<K, T> {
-  Cache<K, T> build(Options options);
+  Cache<K, T> build(CacheBuilder options);
 }

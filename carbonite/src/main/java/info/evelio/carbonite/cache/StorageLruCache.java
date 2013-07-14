@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import static info.evelio.carbonite.cache.CacheType.STORAGE;
+import static info.evelio.carbonite.util.Util.notNull;
 import static info.evelio.carbonite.util.Util.notNullArg;
 import static info.evelio.carbonite.util.Util.validateKey;
 
@@ -35,28 +37,29 @@ import static info.evelio.carbonite.util.Util.validateKey;
  * @param <T>
  */
 public class StorageLruCache<T> implements Cache<String, T> {
-  private static final int MINIMAL_CAPACITY = 1048576;
+  public static final long MINIMAL_CAPACITY = 1048576;
   public static final String TAG = "carbonite:StorageLruCache";
   private static final int VALUE_INDEX = 0;
 
   private final File mDir;
-  private final int mCapacity;
+  private final long mMaxSize;
   private final Class<T> mType;
   private final Serializer<T> mSerializer;
   private DiskLruCache mCache;
 
-  public StorageLruCache(File file, int capacity, Class type, Serializer<T> serializer) {
-    notNullArg(file, "Cache directory must not be null.");
-    notNullArg(type, "Class must not be null.");
-    notNullArg(serializer, "Serializer must not be null.");
+  public StorageLruCache(Options options) {
+    notNullArg(options, "You must provide options.");
 
-    mDir = file;
-    mType = type;
-    mSerializer = serializer;
-    if (capacity < MINIMAL_CAPACITY) {
-      capacity = MINIMAL_CAPACITY;
-    }
-    mCapacity = capacity;
+    mDir = options.directory();
+    notNull(mDir, "Directory must not be null.");
+
+    mType = options.type();
+    notNull(mType, "Type must not be null.");
+
+    mSerializer = options.serializer();
+    notNull(mSerializer, "Serializer must not be null.");
+
+    mMaxSize = Math.max(options.maxSize(), MINIMAL_CAPACITY);
   }
 
   @Override
@@ -130,7 +133,7 @@ public class StorageLruCache<T> implements Cache<String, T> {
     }
 
     try {
-      mCache = DiskLruCache.open(mDir, 1, 1, mCapacity);
+      mCache = DiskLruCache.open(mDir, 1, 1, mMaxSize);
     } catch (IOException e) {
       final String msg = "Failure to open DiskLruCache for type " + mType;
       L.e(TAG, msg, e);
@@ -139,6 +142,54 @@ public class StorageLruCache<T> implements Cache<String, T> {
 
   private static void e(Throwable th, String tmpl, Object... args) {
     L.e(TAG, String.format(tmpl, args), th);
+  }
+
+
+  public static class Options implements CacheOptions<StorageLruCache> {
+    private final File mDirectory;
+    private final long mMaxSize;
+    private final Serializer mSerializer;
+    private final Class mType;
+
+    public <T> Options(File directory, long maxSize, Class<T> type, Serializer<T> serializer) {
+      notNullArg(directory, "You must provide a directory.");
+      notNullArg(serializer, "You must provide a serializer.");
+      notNullArg(type, "You must provide a class of type T.");
+
+      mDirectory = directory;
+      mMaxSize = Math.max(maxSize, MINIMAL_CAPACITY);
+      if (maxSize != mMaxSize) {
+        L.i("carbonite:StorageLruCache", String.format("Using at least %d bytes", MINIMAL_CAPACITY));
+      }
+      mSerializer = serializer;
+      mType = type;
+    }
+
+    public File directory() {
+      return mDirectory;
+    }
+
+    public long maxSize() {
+      return mMaxSize;
+    }
+
+    public <T> Serializer<T> serializer() {
+      return mSerializer;
+    }
+
+    public <T> Class<T> type() {
+      return mType;
+    }
+
+    @Override
+    public CacheType cacheType() {
+      return STORAGE;
+    }
+
+    @Override
+    public Class<? extends StorageLruCache> imp() {
+      return StorageLruCache.class;
+    }
   }
 
 }

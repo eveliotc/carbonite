@@ -16,15 +16,16 @@
  */
 package info.evelio.carbonite;
 
+import info.evelio.carbonite.cache.CacheType;
 import org.junit.Test;
 
-import static info.evelio.carbonite.Carbonite.CacheType.values;
+import static info.evelio.carbonite.cache.CacheType.values;
 import static info.evelio.carbonite.util.Util.empty;
 import static info.evelio.carbonite.util.Util.len;
 import static info.evelio.carbonite.util.Util.obtainValidKey;
 import static info.evelio.carbonite.util.Util.validateKey;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class KeyBuildingTest {
@@ -35,16 +36,16 @@ public class KeyBuildingTest {
   @Test public void testBuildsProperlyForName() {
     final String actualKey = "key";
 
-    Carbonite.CacheType[] types = values();
-    for (Carbonite.CacheType type : types) {
+    CacheType[] types = values();
+    for (CacheType type : types) {
       final String key = CarboniteImp.buildKey(type, actualKey);
       assertKey(type, key, actualKey);
     }
   }
 
   @Test public void testBuildsProperlyForClassWithoutCache() {
-    Carbonite.CacheType[] types = values();
-    for (Carbonite.CacheType type : types) {
+    CacheType[] types = values();
+    for (CacheType type : types) {
       final String key = CarboniteImp.buildKey(type, TARGET_CLASS, null);
       assertKey(type, key, GIVEN_KEY);
     }
@@ -53,8 +54,8 @@ public class KeyBuildingTest {
 
   @Test public void testBuildsProperlyForClassWithCache() {
     final CarboniteImp.KeyCache cache = new CarboniteImp.KeyCache();
-    Carbonite.CacheType[] types = values();
-    for (Carbonite.CacheType type : types) {
+    CacheType[] types = values();
+    for (CacheType type : types) {
       final String key = CarboniteImp.buildKey(type, TARGET_CLASS, cache);
       assertKey(type, key, GIVEN_KEY);
       // Ensure cache keeps same cached keys
@@ -62,7 +63,7 @@ public class KeyBuildingTest {
     }
   }
 
-  private static void assertKey(Carbonite.CacheType type, String key, String actualKey) {
+  private static void assertKey(CacheType type, String key, String actualKey) {
     assertFalse(empty(key));
     validateKey(actualKey);
     validateKey(key);

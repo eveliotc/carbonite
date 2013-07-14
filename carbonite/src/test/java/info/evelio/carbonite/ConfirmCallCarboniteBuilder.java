@@ -18,6 +18,7 @@ package info.evelio.carbonite;
 
 import android.content.Context;
 
+import static info.evelio.carbonite.CarboniteApi.CarboniteBuilder;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /*package*/ class ConfirmCallCarboniteBuilder implements CarboniteBuilder {
@@ -55,7 +56,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
   }
 
   @Override
-  public Options retaining(Class type) {
+  public CarboniteApi.CacheBuilder retaining(Class type) {
     called();
     return null;
   }

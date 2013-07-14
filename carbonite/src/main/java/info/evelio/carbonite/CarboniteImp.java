@@ -18,6 +18,7 @@ package info.evelio.carbonite;
 
 import android.content.Context;
 import info.evelio.carbonite.cache.Cache;
+import info.evelio.carbonite.cache.CacheType;
 import info.evelio.carbonite.cache.ReferenceCache;
 import info.evelio.carbonite.cache.UnmodifiableCache;
 import org.jetbrains.annotations.NotNull;
@@ -31,10 +32,10 @@ import java.util.concurrent.ThreadFactory;
 
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 import static android.os.Process.setThreadPriority;
-import static info.evelio.carbonite.Carbonite.CacheType.MEMORY;
-import static info.evelio.carbonite.Carbonite.CacheType.STORAGE;
 import static info.evelio.carbonite.Carbonite.Defaults.LOAD_FACTOR;
 import static info.evelio.carbonite.Carbonite.Defaults.THREADS;
+import static info.evelio.carbonite.cache.CacheType.MEMORY;
+import static info.evelio.carbonite.cache.CacheType.STORAGE;
 import static info.evelio.carbonite.util.Util.checkedClass;
 import static info.evelio.carbonite.util.Util.empty;
 import static info.evelio.carbonite.util.Util.illegalAccess;
@@ -53,7 +54,7 @@ import static info.evelio.carbonite.util.Util.validateKey;
 /*package*/ class CarboniteImp extends Carbonite {
 
   private final Cache<String, Cache> mCaches;
-  private final ExecutorService mExecutor; // TODO this should be static
+  private final ExecutorService mExecutor;
 
   /*package*/ CarboniteImp(Cache<String, Cache> caches, ExecutorService executor) {
     mCaches = new UnmodifiableCache<String, Cache>(caches);
@@ -245,42 +246,24 @@ import static info.evelio.carbonite.util.Util.validateKey;
         .append(givenKey).toString();
   }
 
-  /*package*/ static class Builder implements CarboniteBuilder {
-    private final Context mContext;
-    private Set<Options> mOptions;
+  /*package*/ static class Builder extends CarboniteBuilderBaseImp {
+    private Set<CacheBuilder> mOptions;
 
     public Builder(Context applicationContext) {
-      notNullArg(applicationContext, "Context must not be null.");
-
-      mContext = applicationContext;
+      super(applicationContext);
     }
 
     @Override
-    public Context context() {
-      return mContext;
-    }
-
-    @Override
-    public Options retaining(Class type) {
+    public CacheBuilder retaining(Class type) {
       notNullArg(type, "Class must not be null");
 
       if (mOptions == null) {
-        mOptions = new LinkedHashSet<Options>(1, LOAD_FACTOR);
+        mOptions = new LinkedHashSet<CacheBuilder>(1, LOAD_FACTOR);
       }
 
-      BaseOptions options = new BaseOptions(this, type);
+      final CacheBuilder options = new DefaultCacheBuilder(this, type);
       mOptions.add(options);
       return options;
-    }
-
-    @Override
-    public CarboniteBuilder iLoveYou() {
-      return this;
-    }
-
-    @Override
-    public Carbonite iKnow() {
-      return build();
     }
 
     @Override
@@ -290,12 +273,12 @@ import static info.evelio.carbonite.util.Util.validateKey;
       final int length = len(mOptions);
 
       // This is where we set all our caches
-      final Cache<String, Cache> caches = new ReferenceCache<String, Cache>(length, 1);
+      final Cache<String, Cache> caches = buildReferenceCache(length);
 
       // For every retained class
-      for (final Options options : mOptions) {
-        final Class type = options.retaining();
-        final CacheType cacheType = options.in();
+      for (final CacheBuilder options : mOptions) {
+        final Class type = options.type();
+        final CacheType cacheType = options.cacheType();
 
         // try to built with given options
         final Cache built = options.factory().build(options);
@@ -306,14 +289,19 @@ import static info.evelio.carbonite.util.Util.validateKey;
 
       return new CarboniteImp(caches, newFixedCachedThread(THREADS, new CarboniteThreadFactory()));
     }
+  }
 
+  private static <K, V> ReferenceCache<K, V> buildReferenceCache(int initialCapacity) {
+    final ReferenceCache.Options opts = new ReferenceCache.Options(initialCapacity, LOAD_FACTOR);
+    return new ReferenceCache<K, V>(opts);
   }
 
   /*package*/ static class KeyCache implements Cache<CacheType, Cache<Class, String>> {
     private final ReferenceCache<CacheType, Cache<Class, String>> mRealCache;
 
     KeyCache() {
-      mRealCache = new ReferenceCache<CacheType, Cache<Class, String>>(CacheType.values().length, 1);
+      // TODO Use a weak reference cache
+      mRealCache = buildReferenceCache(CacheType.values().length);
     }
 
     @Override
@@ -322,7 +310,7 @@ import static info.evelio.carbonite.util.Util.validateKey;
 
       Cache<Class, String> value = mRealCache.get(key);
       if (value == null) {
-        value = new ReferenceCache<Class, String>(1, LOAD_FACTOR);
+        value = buildReferenceCache(1);
         mRealCache.set(key, value);
       }
       return value;

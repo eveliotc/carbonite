@@ -30,8 +30,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static info.evelio.carbonite.Carbonite.CacheType.MEMORY;
-import static info.evelio.carbonite.Carbonite.CacheType.STORAGE;
+import static info.evelio.carbonite.cache.CacheType.MEMORY;
+import static info.evelio.carbonite.cache.CacheType.STORAGE;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;

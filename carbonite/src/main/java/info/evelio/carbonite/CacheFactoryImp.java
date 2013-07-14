@@ -20,14 +20,19 @@ import android.content.Context;
 import com.esotericsoftware.kryo.Kryo;
 import info.evelio.carbonite.cache.Cache;
 import info.evelio.carbonite.cache.CacheFactory;
+import info.evelio.carbonite.cache.CacheOptions;
+import info.evelio.carbonite.cache.CacheType;
 import info.evelio.carbonite.cache.MemoryLruCache;
 import info.evelio.carbonite.cache.StorageLruCache;
 import info.evelio.carbonite.serialization.KryoSerializer;
+import info.evelio.carbonite.serialization.Serializer;
 
 import java.io.File;
 
-import static info.evelio.carbonite.Carbonite.CacheType;
-import static info.evelio.carbonite.Carbonite.Defaults.MAX_SIZE;
+import static info.evelio.carbonite.Carbonite.Defaults.LRU_SIZE;
+import static info.evelio.carbonite.CarboniteApi.CacheBuilder;
+import static info.evelio.carbonite.cache.StorageLruCache.MINIMAL_CAPACITY;
+import static info.evelio.carbonite.cache.StorageLruCache.Options;
 import static info.evelio.carbonite.util.Util.illegalState;
 import static info.evelio.carbonite.util.Util.notNull;
 import static info.evelio.carbonite.util.Util.notNullArg;
@@ -37,27 +42,30 @@ import static info.evelio.carbonite.util.Util.obtainValidKey;
   /*package*/ static final CacheFactoryImp INSTANCE = new CacheFactoryImp();
 
   @Override
-  public Cache<String, T> build(CarboniteBuilder.Options options) {
+  public Cache<String, T> build(CacheBuilder options) {
     notNullArg(options, "Invalid options given.");
 
-    if (options.imp() != null) {
+    final CacheOptions opts = options.opts();
+    if (opts != null) {
+      illegalState(true, "Using options instantiation not yet implemented.");
+    }
+
+    if (opts != null && opts.imp() != null) {
       illegalState(true, "Implementation instantiation not yet implemented.");
     }
 
-    final CacheType cacheType = options.in();
+    final CacheType cacheType = options.cacheType();
 
     switch (cacheType) {
       case MEMORY:
-        // TODO actually define Options per cache implementation so we don't call capacity mixed units
-        final int maxSize = Math.max(MAX_SIZE, options.capacity());
-        return new MemoryLruCache<String, T>(maxSize);
+        return new MemoryLruCache<String, T>(new MemoryLruCache.Options(LRU_SIZE));
       case STORAGE:
-        final Class type = options.retaining();
-        return new StorageLruCache<T>(
-            buildCacheDir(options.context(), type),
-            options.capacity(),
-            type,
-            new KryoSerializer<T>(new Kryo(), type)); // TODO yikes a builder or something
+        // TODO yikes a builder or something
+        final Class type = options.type();
+        final File dir = buildCacheDir(options.context(), type);
+        final Serializer<T> serializer = new KryoSerializer<T>(new Kryo(), type);
+        final Options storageOpts = new Options(dir, MINIMAL_CAPACITY, type, serializer);
+        return new StorageLruCache<T>(storageOpts);
       default:
         illegalState(true, "Not yet implemented cache type " + cacheType);
         return null;
