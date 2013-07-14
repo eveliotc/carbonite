@@ -2,7 +2,7 @@ package info.evelio.carbonite.cache;
 
 import java.util.Map;
 
-import static info.evelio.carbonite.Util.validateKey;
+import static info.evelio.carbonite.util.Util.validateKey;
 
 /**
  * A simple implementation that uses a {@link java.util.Map} to keep strong references to keys and values in Memory

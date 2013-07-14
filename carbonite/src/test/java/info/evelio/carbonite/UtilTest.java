@@ -1,9 +1,10 @@
 package info.evelio.carbonite;
 
+import info.evelio.carbonite.util.Util;
 import org.junit.Test;
 
-import static info.evelio.carbonite.Util.obtainValidKey;
-import static info.evelio.carbonite.Util.validateKey;
+import static info.evelio.carbonite.util.Util.obtainValidKey;
+import static info.evelio.carbonite.util.Util.validateKey;
 import static org.junit.Assert.*;
 
 public class UtilTest {

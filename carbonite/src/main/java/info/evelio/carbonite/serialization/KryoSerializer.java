@@ -3,12 +3,12 @@ package info.evelio.carbonite.serialization;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import info.evelio.carbonite.Util;
+import info.evelio.carbonite.util.Util;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import static info.evelio.carbonite.Util.notNullArg;
+import static info.evelio.carbonite.util.Util.notNullArg;
 
 public class KryoSerializer<T> implements Serializer<T> {
   private final Kryo mKryo;

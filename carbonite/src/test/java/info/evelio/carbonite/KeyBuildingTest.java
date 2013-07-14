@@ -3,10 +3,10 @@ package info.evelio.carbonite;
 import org.junit.Test;
 
 import static info.evelio.carbonite.Carbonite.CacheType.values;
-import static info.evelio.carbonite.Util.empty;
-import static info.evelio.carbonite.Util.len;
-import static info.evelio.carbonite.Util.obtainValidKey;
-import static info.evelio.carbonite.Util.validateKey;
+import static info.evelio.carbonite.util.Util.empty;
+import static info.evelio.carbonite.util.Util.len;
+import static info.evelio.carbonite.util.Util.obtainValidKey;
+import static info.evelio.carbonite.util.Util.validateKey;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

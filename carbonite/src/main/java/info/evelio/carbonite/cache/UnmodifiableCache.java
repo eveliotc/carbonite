@@ -1,7 +1,7 @@
 package info.evelio.carbonite.cache;
 
-import static info.evelio.carbonite.Util.illegalAccess;
-import static info.evelio.carbonite.Util.notNullArg;
+import static info.evelio.carbonite.util.Util.illegalAccess;
+import static info.evelio.carbonite.util.Util.notNullArg;
 
 /**
  * A {@link Cache} wrapper to make it unmodifiable

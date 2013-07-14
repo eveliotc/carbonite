@@ -1,6 +1,6 @@
 package info.evelio.carbonite.future;
 
-import info.evelio.carbonite.Util;
+import info.evelio.carbonite.util.Util;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;

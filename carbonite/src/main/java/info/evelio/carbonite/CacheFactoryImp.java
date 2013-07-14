@@ -11,7 +11,7 @@ import info.evelio.carbonite.serialization.KryoSerializer;
 import java.io.File;
 
 import static info.evelio.carbonite.Carbonite.CacheType;
-import static info.evelio.carbonite.Util.*;
+import static info.evelio.carbonite.util.Util.*;
 
 /*package*/ class CacheFactoryImp<T> implements CacheFactory<String, T> {
   /*package*/ static final CacheFactoryImp INSTANCE = new CacheFactoryImp();

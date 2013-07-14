@@ -4,6 +4,7 @@ import android.content.Context;
 import info.evelio.carbonite.cache.Cache;
 import info.evelio.carbonite.cache.ReferenceCache;
 import info.evelio.carbonite.cache.UnmodifiableCache;
+import info.evelio.carbonite.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashSet;
@@ -19,18 +20,18 @@ import static info.evelio.carbonite.Carbonite.CacheType.MEMORY;
 import static info.evelio.carbonite.Carbonite.CacheType.STORAGE;
 import static info.evelio.carbonite.Carbonite.Defaults.LOAD_FACTOR;
 import static info.evelio.carbonite.Carbonite.Defaults.THREADS;
-import static info.evelio.carbonite.Util.checkedClass;
-import static info.evelio.carbonite.Util.empty;
-import static info.evelio.carbonite.Util.illegalAccess;
-import static info.evelio.carbonite.Util.illegalArg;
-import static info.evelio.carbonite.Util.len;
-import static info.evelio.carbonite.Util.nonEmpty;
-import static info.evelio.carbonite.Util.nonEmptyArg;
-import static info.evelio.carbonite.Util.notNull;
-import static info.evelio.carbonite.Util.notNullArg;
-import static info.evelio.carbonite.Util.obtainValidKey;
-import static info.evelio.carbonite.Util.present;
-import static info.evelio.carbonite.Util.validateKey;
+import static info.evelio.carbonite.util.Util.checkedClass;
+import static info.evelio.carbonite.util.Util.empty;
+import static info.evelio.carbonite.util.Util.illegalAccess;
+import static info.evelio.carbonite.util.Util.illegalArg;
+import static info.evelio.carbonite.util.Util.len;
+import static info.evelio.carbonite.util.Util.nonEmpty;
+import static info.evelio.carbonite.util.Util.nonEmptyArg;
+import static info.evelio.carbonite.util.Util.notNull;
+import static info.evelio.carbonite.util.Util.notNullArg;
+import static info.evelio.carbonite.util.Util.obtainValidKey;
+import static info.evelio.carbonite.util.Util.present;
+import static info.evelio.carbonite.util.Util.validateKey;
 
 /*package*/ class CarboniteImp extends Carbonite {
 

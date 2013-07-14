@@ -2,8 +2,9 @@ package info.evelio.carbonite;
 
 import android.content.Context;
 import info.evelio.carbonite.cache.CacheFactory;
+import info.evelio.carbonite.util.L;
 
-import static info.evelio.carbonite.Util.nonEmptyArg;
+import static info.evelio.carbonite.util.Util.nonEmptyArg;
 
 public abstract class Carbonite implements CarboniteApi {
 

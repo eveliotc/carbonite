@@ -3,7 +3,7 @@ package info.evelio.carbonite.cache;
 import com.jakewharton.disklrucache.DiskLruCache;
 import com.jakewharton.disklrucache.DiskLruCache.Editor;
 import com.jakewharton.disklrucache.DiskLruCache.Snapshot;
-import info.evelio.carbonite.L;
+import info.evelio.carbonite.util.L;
 import info.evelio.carbonite.serialization.Serializer;
 
 import java.io.File;
@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import static info.evelio.carbonite.Util.notNullArg;
-import static info.evelio.carbonite.Util.validateKey;
+import static info.evelio.carbonite.util.Util.notNullArg;
+import static info.evelio.carbonite.util.Util.validateKey;
 
 /**
  * Best effort storage cache to use a LRU cache in a directory and a {@link Serializer} to put values on it.

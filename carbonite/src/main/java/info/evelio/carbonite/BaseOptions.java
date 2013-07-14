@@ -6,8 +6,8 @@ import info.evelio.carbonite.cache.CacheFactory;
 
 import static info.evelio.carbonite.Carbonite.CacheType;
 import static info.evelio.carbonite.Carbonite.Defaults.*;
-import static info.evelio.carbonite.Util.illegalArg;
-import static info.evelio.carbonite.Util.notNullArg;
+import static info.evelio.carbonite.util.Util.illegalArg;
+import static info.evelio.carbonite.util.Util.notNullArg;
 
 public class BaseOptions implements CarboniteBuilder.Options {
   private final CarboniteBuilder mCarboniteBuilder;
