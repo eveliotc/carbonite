@@ -20,13 +20,14 @@ import android.content.Context;
 import com.esotericsoftware.kryo.Kryo;
 import info.evelio.carbonite.cache.Cache;
 import info.evelio.carbonite.cache.CacheFactory;
-import info.evelio.carbonite.cache.ReferenceCache;
+import info.evelio.carbonite.cache.MemoryLruCache;
 import info.evelio.carbonite.cache.StorageLruCache;
 import info.evelio.carbonite.serialization.KryoSerializer;
 
 import java.io.File;
 
 import static info.evelio.carbonite.Carbonite.CacheType;
+import static info.evelio.carbonite.Carbonite.Defaults.MAX_SIZE;
 import static info.evelio.carbonite.util.Util.illegalState;
 import static info.evelio.carbonite.util.Util.notNull;
 import static info.evelio.carbonite.util.Util.notNullArg;
@@ -47,7 +48,9 @@ import static info.evelio.carbonite.util.Util.obtainValidKey;
 
     switch (cacheType) {
       case MEMORY:
-        return new ReferenceCache<String, T>(options.capacity(), options.loadFactor());
+        // TODO actually define Options per cache implementation so we don't call capacity mixed units
+        final int maxSize = Math.max(MAX_SIZE, options.capacity());
+        return new MemoryLruCache<String, T>(maxSize);
       case STORAGE:
         final Class type = options.retaining();
         return new StorageLruCache<T>(
