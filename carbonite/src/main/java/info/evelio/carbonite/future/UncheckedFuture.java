@@ -7,7 +7,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class UncheckedFuture<V> implements Future<V>{
+public class UncheckedFuture<V> implements Future<V> {
   private final Future<V> mWrapped;
 
   public UncheckedFuture(Future<V> future) {

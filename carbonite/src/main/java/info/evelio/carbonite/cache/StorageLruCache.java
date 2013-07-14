@@ -82,7 +82,7 @@ public class StorageLruCache<T> implements Cache<String, T> {
     try {
       editor = mCache.edit(key);
     } catch (IOException e) {
-      L.e(TAG, String.format("Unable to edit %s for %s of type %s ", key, value,mType), e);
+      L.e(TAG, String.format("Unable to edit %s for %s of type %s ", key, value, mType), e);
     }
 
     if (editor == null) {

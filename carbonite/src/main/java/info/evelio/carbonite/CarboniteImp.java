@@ -4,7 +4,6 @@ import android.content.Context;
 import info.evelio.carbonite.cache.Cache;
 import info.evelio.carbonite.cache.ReferenceCache;
 import info.evelio.carbonite.cache.UnmodifiableCache;
-import info.evelio.carbonite.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashSet;
@@ -25,6 +24,7 @@ import static info.evelio.carbonite.util.Util.empty;
 import static info.evelio.carbonite.util.Util.illegalAccess;
 import static info.evelio.carbonite.util.Util.illegalArg;
 import static info.evelio.carbonite.util.Util.len;
+import static info.evelio.carbonite.util.Util.newFixedCachedThread;
 import static info.evelio.carbonite.util.Util.nonEmpty;
 import static info.evelio.carbonite.util.Util.nonEmptyArg;
 import static info.evelio.carbonite.util.Util.notNull;
@@ -122,7 +122,7 @@ import static info.evelio.carbonite.util.Util.validateKey;
   }
 
   private <T> Cache<String, T> cacheFor(CacheType cacheType, Class<T> type) {
-    final Cache<String, T> cache = mCaches.get( buildKey(cacheType, type) );
+    final Cache<String, T> cache = mCaches.get(buildKey(cacheType, type));
     return cache;
   }
 
@@ -142,9 +142,9 @@ import static info.evelio.carbonite.util.Util.validateKey;
     // TODO allow only unique ACTIONS, if we are setting/getting certain key multiple times submit just once
     switch (action) {
       case SET:
-        return (Future<T>) mExecutor.submit( new SetTask(key, value, cache) );
+        return (Future<T>) mExecutor.submit(new SetTask(key, value, cache));
       case GET:
-        return mExecutor.submit( new GetTask(key, cache) );
+        return mExecutor.submit(new GetTask(key, cache));
       default:
         illegalArg(true, "Unknown action " + action);
         return null;
@@ -287,7 +287,7 @@ import static info.evelio.carbonite.util.Util.validateKey;
         caches.set(buildKey(cacheType, type), built); // alrite let's cache it!
       }
 
-      return new CarboniteImp( caches, Util.newFixedCachedThread(THREADS, new CarboniteThreadFactory()) );
+      return new CarboniteImp(caches, newFixedCachedThread(THREADS, new CarboniteThreadFactory()));
     }
 
   }

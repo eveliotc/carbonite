@@ -1,4 +1,4 @@
-package info.evelio.carbonite;
+package info.evelio.carbonite.util;
 
 import info.evelio.carbonite.util.Util;
 import org.junit.Test;

@@ -15,7 +15,7 @@ public abstract class MapCache<K, V> implements Cache<K, V> {
     mCache = onCreateMap(capacity, loadFactor);
   }
 
-  protected abstract Map<K,V> onCreateMap(int capacity, float loadFactor);
+  protected abstract Map<K, V> onCreateMap(int capacity, float loadFactor);
 
   @Override
   public V get(K key) {

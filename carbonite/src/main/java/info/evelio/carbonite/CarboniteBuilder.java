@@ -5,37 +5,37 @@ import info.evelio.carbonite.cache.Cache;
 import info.evelio.carbonite.cache.CacheFactory;
 
 public interface CarboniteBuilder {
-  public Context context();
-  public Options retaining(Class type);
+  Context context();
+  Options retaining(Class type);
 
   // not funny
-  public CarboniteBuilder iLoveYou();
+  CarboniteBuilder iLoveYou();
   // build methods
-  public Carbonite iKnow();
-  public Carbonite build();
+  Carbonite iKnow();
+  Carbonite build();
 
   public interface Options extends CarboniteBuilder {
-    public Options in(Carbonite.CacheType type);
+    Options in(Carbonite.CacheType type);
 
-    public Options capacity(int capacity);
-    public Options loadFactor(float loadFactor);
+    Options capacity(int capacity);
+    Options loadFactor(float loadFactor);
 
-    public Options imp(Class<? extends Cache> imp);
-    public Options factory(CacheFactory factory);
+    Options imp(Class<? extends Cache> imp);
+    Options factory(CacheFactory factory);
 
-    public Carbonite.CacheType in();
-    public int capacity();
-    public float loadFactor();
+    Carbonite.CacheType in();
+    int capacity();
+    float loadFactor();
 
-    public Class<? extends Cache> imp();
-    public CacheFactory factory();
+    Class<? extends Cache> imp();
+    CacheFactory factory();
 
-    public CarboniteBuilder builder();
-    public Class<? extends Object> retaining();
+    CarboniteBuilder builder();
+    Class<? extends Object> retaining();
 
     /**
      * Note: Must spawn a new Options for current retained class instead of return this
      */
-    public Options and(Carbonite.CacheType type);
+    Options and(Carbonite.CacheType type);
   }
 }

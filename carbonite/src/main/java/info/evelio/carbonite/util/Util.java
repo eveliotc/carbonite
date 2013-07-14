@@ -2,7 +2,6 @@ package info.evelio.carbonite.util;
 
 import info.evelio.carbonite.future.Present;
 import info.evelio.carbonite.future.UncheckedFuture;
-import info.evelio.carbonite.util.L;
 
 import java.io.Closeable;
 import java.io.IOException;

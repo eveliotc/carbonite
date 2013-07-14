@@ -31,11 +31,11 @@ public abstract class Carbonite implements CarboniteApi {
   }
 
   public static CarboniteBuilder using(Context context) {
-    return new CarboniteImp.Builder( context.getApplicationContext() );
+    return new CarboniteImp.Builder(context.getApplicationContext());
   }
 
   public static void setLogEnabled(boolean enabled) {
-    L.sLogEnabled = enabled;
+    L.setLogEnabled(enabled);
   }
 
 }

@@ -5,7 +5,10 @@ import info.evelio.carbonite.cache.Cache;
 import info.evelio.carbonite.cache.CacheFactory;
 
 import static info.evelio.carbonite.Carbonite.CacheType;
-import static info.evelio.carbonite.Carbonite.Defaults.*;
+import static info.evelio.carbonite.Carbonite.Defaults.CAPACITY;
+import static info.evelio.carbonite.Carbonite.Defaults.FACTORY;
+import static info.evelio.carbonite.Carbonite.Defaults.LOAD_FACTOR;
+import static info.evelio.carbonite.Carbonite.Defaults.TYPE;
 import static info.evelio.carbonite.util.Util.illegalArg;
 import static info.evelio.carbonite.util.Util.notNullArg;
 

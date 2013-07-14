@@ -2,8 +2,8 @@ package info.evelio.carbonite.cache;
 
 import org.junit.Test;
 
-import static info.evelio.carbonite.TestHelper.gimmeReferenceCacheOfOne;
-import static info.evelio.carbonite.TestHelper.unmodifiable;
+import static info.evelio.carbonite.util.TestHelper.gimmeReferenceCacheOfOne;
+import static info.evelio.carbonite.util.TestHelper.unmodifiable;
 import static org.junit.Assert.assertEquals;
 
 public class UnmodifiableCacheTest {
