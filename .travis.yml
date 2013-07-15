@@ -47,3 +47,7 @@ before_install:
   - rmdir ${FILE}
   - cd ${BASEDIR}
   - unset FILE
+
+install:
+  - cd carbonite
+  - mvn clean install
