@@ -10,6 +10,8 @@ notifications:
 env:
   global:
     - ANDROID_SDK_VERSION="r22.0.1"
+	- ANDROID_BUILD_TOOLS_VERSION="r17"
+    - ANDROID_PLATFORM_TOOLS_VERSION="r17"
     
 jdk:
   - openjdk7
@@ -21,12 +23,27 @@ before_install:
   - sudo apt-get update -qq
   - if [ `uname -m` = x86_64 ]; then sudo apt-get install -qq --force-yes libgd2-xpm ia32-libs ia32-libs-multiarch; fi
   # Android
-  - wget http://dl.google.com/android/android-sdk_${ANDROID_SDK_VERSION}-linux.tgz
-  - tar -zxf android-sdk_${ANDROID_SDK_VERSION}-linux.tgz
-  - export ANDROID_HOME==`pwd`/android-sdk-linux
+  - export FILE=android-sdk_${ANDROID_SDK_VERSION}-linux.tgz
+  - wget http://dl.google.com/android/${FILE}
+  - tar -zxf ${FILE}
+  - export ANDROID_HOME=`pwd`/android-sdk-linux
   - export ANDROID_BUILD_TOOLS_HOME=${ANDROID_HOME}/build-tools/17.0.0
   - export PATH=${ANDROID_BUILD_TOOLS_HOME}:${ANDROID_HOME}/tools:${PATH}
-  - TOOLS=$(android list sdk --no-ui | grep "Android SDK Platform-tools" | cut -d"-" -f1)
-  - android update sdk --filter "$TOOLS" --no-ui --force
-  - SDK=$(android list sdk --no-ui | grep ", API 17," | cut -d"-" -f1)
-  - android update sdk --filter "$SDK" --no-ui --force
+  - rm ${FILE}
+  - unset FILE
+  
+  # Build tools
+  # Zip from repository contains android-*.*.* folder inside,
+  # we are need only a content from it
+  - export BASEDIR=`pwd`
+  - mkdir -p ${ANDROID_BUILD_TOOLS_HOME}
+  - cd ${ANDROID_BUILD_TOOLS_HOME}
+  - export FILE=build-tools_${ANDROID_BUILD_TOOLS_VERSION}-linux.zip
+  - wget http://dl.google.com/android/repository/${FILE}
+  - unzip -q ${FILE}
+  - rm ${FILE}
+  - export FILE=$(ls)
+  - mv ${FILE}/* .
+  - rmdir ${FILE}
+  - cd ${BASEDIR}
+  - unset FILE
