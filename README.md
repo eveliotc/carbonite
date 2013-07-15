@@ -16,7 +16,7 @@ you should evaluate when traditional persistence solutions make more sense based
 **Note**: Carbonite is currently under heavy first version development so API and stuff might change among versions,
 please bear with us.
 
-[![Build Status](https://travis-ci.org/eveliotc/carbonite?branch=develop)](https://travis-ci.org/eveliotc/carbonite)
+[![Build Status](https://travis-ci.org/eveliotc/carbonite.png?branch=develop)](https://travis-ci.org/eveliotc/carbonite)
 
 ### How does it work?
 
