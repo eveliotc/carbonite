@@ -10,7 +10,7 @@ notifications:
 env:
   global:
     - ANDROID_SDK_VERSION="r22.0.1"
-	- ANDROID_BUILD_TOOLS_VERSION="r17"
+    - ANDROID_BUILD_TOOLS_VERSION="r17"
     - ANDROID_PLATFORM_TOOLS_VERSION="r17"
     
 jdk:
