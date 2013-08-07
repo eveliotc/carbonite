@@ -24,13 +24,26 @@ Carbonite keeps your POJOs in memory while transparently persisting them in back
  later either from memory or loading them asynchronously/synchronously from storage. You can specify how and how long
  are them kept, for finer control you can provide your own implementations.
  
-Current implementations vary, all of them are stale values prone if you do not properly use them.
+Current implementations vary, all of them are stale values prone if you do not use them properly.
 
 `TODO provide docs regarding current implementations and how to use them, etc.`
 
 ### Usage
 1. Include it in your project. 
-`TODO info regarding jar, maven, gradle, etc.`
+To include carbonite in your Android project you can do it so in your dependecies:
+
+  #####Gradle
+```groovy
+compile 'info.evelio:carbonite:(insert latest version)'
+```
+  #####Maven
+```xml
+<dependency>
+  <groupId>info.evelio</groupId>
+  <artifactId>carbonite</artifactId>
+  <version>(insert latest version)</version>
+</dependency>
+```
 
 
 2. Build your carbonite instance:
