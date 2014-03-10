@@ -114,6 +114,8 @@ This is a raw short term roadmap of features that I'd like to see in Carbonite:
   - You can provide your own using a `CacheFactory` or providing `CacheOptions` on build time.
   - For `StorageLruCache` you can provide your own `Serializer` using `StorageLruCache.Options`.
 - Optional unsafe `get`, `retaining`, etc. methods without `Class` param.
+- Empty/wrap `Object`s, instead of returning a `Future` return an empty instance which will contain the proper data once object is loaded (cons: bug prone pros: happy code without null checks)
+- Out of the box support for a Bus (e.g. Otto, EventBus, etc.)
 
 ### About
 Brought to you by the Carbonite contributors specially [this guy](http://gplus.to/eveliotc).
