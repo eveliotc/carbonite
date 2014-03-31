@@ -30,56 +30,56 @@ Current implementations vary, all of them are stale values prone if you do not u
 
 ### Usage
 1. Include it in your project. 
-To include carbonite in your Android project you can do it so in your dependecies:
+  To include carbonite in your Android project you can do it so in your dependecies:
 
   #####Gradle
-```groovy
-compile 'info.evelio:carbonite:(insert latest version)'
-```
+  ```groovy
+  compile 'info.evelio:carbonite:(insert latest version)'
+  ```
   #####Maven
-```xml
-<dependency>
-  <groupId>info.evelio</groupId>
-  <artifactId>carbonite</artifactId>
-  <version>(insert latest version)</version>
-</dependency>
-```
-
+  ```xml
+  <dependency>
+    <groupId>info.evelio</groupId>
+    <artifactId>carbonite</artifactId>
+    <version>(insert latest version)</version>
+  </dependency>
+  ```
 
 2. Build your carbonite instance:
-```java
-  Carbonite.using(context) /* getApplicationContext() is used and not retained */
+  ```java
+    Carbonite.using(context) /* getApplicationContext() is used and not retained */
         .retaining(YourPojo.class)
         .in(MEMORY) /* optional, default */
         .and(STORAGE) /* optional if you don't want to keep in memory */
         /* This can be replaced by just build() */
         .iLoveYou() /* Does nothing */
         .iKnow(); // calls build()
-```
+  ```
 
 3. Use it:
-##### set
-```java
-  YourPojo data = …
-  ...
-  carbonite.set("data", data); // will keep it in memory and async persist it to storage
-```
-You can also use `memory` and `storage` for a blocking way.
-##### get
-From memory:
-```java
-  YourPojo stored = carbonite.memory("data", YourPojo.class);
-```
-From storage (blocking):
-```java
-  YourPojo stored = carbonite.storage("data", YourPojo.class);
-```
-From memory (blocking) or storage (async):
-```java
-  Future<YourPojo> future = carbonite.get("data", YourPojo.class);
-  …
-  YourPojo stored = future.get();
-```
+  
+  #####set
+  ```java
+    YourPojo data = …
+    ...
+    carbonite.set("data", data); // will keep it in memory and async persist it to storage
+  ```
+  You can also use `memory` and `storage` for a blocking way.
+  #####get
+  From memory:
+  ```java
+    YourPojo stored = carbonite.memory("data", YourPojo.class);
+  ```
+  From storage (blocking):
+  ```java
+    YourPojo stored = carbonite.storage("data", YourPojo.class);
+  ```
+  From memory (blocking) or storage (async):
+  ```java
+    Future<YourPojo> future = carbonite.get("data", YourPojo.class);
+    …
+    YourPojo stored = future.get();
+  ```
 
 **Notes**:
 
