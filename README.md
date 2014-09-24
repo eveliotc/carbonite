@@ -13,8 +13,7 @@ ORMs, SQLite, `Cursor`s, `ContentProvider`s, etc. for data that you already hold
 Although it can be used as the only persistence solution on Android, *it is not* one of carbonite goals to do so,
 you should evaluate when traditional persistence solutions make more sense based on your problem.
 
-**Note**: Carbonite is currently under heavy first version development so API and stuff might change among versions,
-please bear with us.
+**Note**: Carbonite is currently under first version development so API and stuff might change among versions.
 
 [![Build Status](https://travis-ci.org/eveliotc/carbonite.png?branch=develop)](https://travis-ci.org/eveliotc/carbonite)
 
@@ -31,18 +30,17 @@ Current implementations vary, all of them are stale values prone if you do not u
 ### Usage
 1. Include it in your project. 
   To include carbonite in your Android project you can do it so in your dependecies:
+  At this point only `SNAPSHOT` versions are available.
 
   #####Gradle
   ```groovy
-  compile 'info.evelio:carbonite:(insert latest version)'
-  ```
-  #####Maven
-  ```xml
-  <dependency>
-    <groupId>info.evelio</groupId>
-    <artifactId>carbonite</artifactId>
-    <version>(insert latest version)</version>
-  </dependency>
+  repositories {
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+  }
+  
+  dependencies {
+     compile 'info.evelio:carbonite:0.1-SNAPSHOT'
+  }
   ```
 
 2. Build your carbonite instance:
@@ -85,16 +83,6 @@ Current implementations vary, all of them are stale values prone if you do not u
 
 - `MEMORY` operations will always happen in calling thread as often will be as simple as `put`/`get` an item in/from a `Map`, while `STORAGE` operations happen asynchronously for `set` and `get` and are blocking for `storage` calls.
 
-
-### Goals
-- Simplicity (DRY, YAGNI, etc.)
-- Zero boilerplate code
-- Fast
-- Dependencies free
-- Optimized for Android
-- Easy and fun to use
-
-
 ### Roadmap
 This is a raw short term roadmap of features that I'd like to see in Carbonite:
 
@@ -118,7 +106,6 @@ This is a raw short term roadmap of features that I'd like to see in Carbonite:
 - Out of the box support for a Bus (e.g. Otto, EventBus, etc.)
 
 ### About
-Brought to you by the Carbonite contributors specially [this guy](http://gplus.to/eveliotc).
 
 Carbonite relies (yet totally optional) on the following awesome open source software:
 
